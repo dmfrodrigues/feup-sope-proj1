@@ -1,53 +1,51 @@
 #include "simpledu_args.h"
 
-#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
 
 const simpledu_args_t simpledu_args_default = {false, 1024, false, false, false, PATH_MAX/2, 0, NULL};
 
-int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
-    simpledu_args_t ret = simpledu_args_default;
+int simpledu_args_ctor(simpledu_args_t *p, int argc, const char * const argv[]){
+    *p = simpledu_args_default;
     int block_size, max_depth;
     for(int i = 0; i < argc; ++i){
         const char *s = argv[i];
-        if     (strcmp(s, "-a") == 0 || strcmp(s, "--all"          ) == 0) ret.all           = true;
-        else if(strcmp(s, "-b") == 0 || strcmp(s, "--bytes"        ) == 0) ret.block_size    =    1;
-        else if(strcmp(s, "-l") == 0 || strcmp(s, "--count-links"  ) == 0) ret.count_links   = true;
-        else if(strcmp(s, "-L") == 0 || strcmp(s, "--dereference"  ) == 0) ret.dereference   = true;
-        else if(strcmp(s, "-S") == 0 || strcmp(s, "--separate-dirs") == 0) ret.separate_dirs = true;
-        else if(strcmp(s, "-B")){
+        if(strcmp(s, "-a") == 0 || strcmp(s, "--all"          ) == 0){ p->all           = true; continue; }
+        if(strcmp(s, "-b") == 0 || strcmp(s, "--bytes"        ) == 0){ p->block_size    =    1; continue; }
+        if(strcmp(s, "-l") == 0 || strcmp(s, "--count-links"  ) == 0){ p->count_links   = true; continue; }
+        if(strcmp(s, "-L") == 0 || strcmp(s, "--dereference"  ) == 0){ p->dereference   = true; continue; }
+        if(strcmp(s, "-S") == 0 || strcmp(s, "--separate-dirs") == 0){ p->separate_dirs = true; continue; }
+        if(strcmp(s, "-B") == 0){
             s = argv[++i];
-            if(sscanf(s, "%d", &ret.block_size) != 1){
+            if(sscanf(s, "%llu", &p->block_size) != 1){
                 errno = EINVAL;
                 return EXIT_FAILURE;
             }
+            continue;
         }
-        else if(sscanf(s, "--blocksize=%d", &block_size) == 1) ret.block_size = block_size;
-        else if(strcmp(s, "-d")){
+        if(sscanf(s, "--blocksize=%d", &block_size) == 1){ p->block_size = block_size; continue; }
+        if(strcmp(s, "-d") == 0){
             s = argv[++i];
-            if(sscanf(s, "%d", &ret.max_depth) != 1){
+            if(sscanf(s, "%hu", &p->max_depth) != 1){
                 errno = EINVAL;
                 return EXIT_FAILURE;
             }
+            continue;
         }
-        else if(scanf(s, "--max-depth=%d", &max_depth) == 1) ret.max_depth = max_depth;
-        else{
-            char *c = malloc(sizeof(char)*(strlen(s)+1));
-            strcpy(c, s);
-            ++ret.filesc;
-            ret.files = realloc(ret.files, sizeof(char*)*ret.filesc);
-            ret.files[ret.filesc-1] = c;
-        }
+        if(sscanf(s, "--max-depth=%d", &max_depth) == 1){ p->max_depth = max_depth; continue; }
+        char *c = malloc(sizeof(char)*(strlen(s)+1));
+        strcpy(c, s);
+        ++p->filesc;
+        p->files = realloc(p->files, sizeof(char*)*p->filesc);
+        p->files[p->filesc-1] = c;
     }
-    if(ret.filesc == 0){
+    if(p->filesc == 0){
         char *c = ".";
-        ++ret.filesc;
-        ret.files = realloc(ret.files, sizeof(char*)*ret.filesc);
-        ret.files[ret.filesc-1] = c;
+        ++p->filesc;
+        p->files = realloc(p->files, sizeof(char*)*p->filesc);
+        p->files[p->filesc-1] = c;
     }
-    *p = ret;
     return EXIT_SUCCESS;
 }
 
@@ -55,4 +53,22 @@ int simpledu_args_dtor(simpledu_args_t *p){
     for(int i = 0; i < p->filesc; ++i) free(p->files[i]);
     free(p->files);
     return EXIT_SUCCESS;
+}
+
+bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2){
+    if(p1 == p2) return true;
+    if(p1 == NULL || p2 == NULL) return false;
+    if(!(
+        p1->all             == p2->all              &&
+        p1->block_size      == p2->block_size       &&
+        p1->count_links     == p2->count_links      &&
+        p1->dereference     == p2->dereference      &&
+        p1->separate_dirs   == p2->separate_dirs    &&
+        p1->max_depth       == p2->max_depth        && 
+        p1->filesc          == p2->filesc
+    )) return false;
+    for(size_t i = 0; i < p1->filesc; ++i){
+        if(strcmp(p1->files[i], p2->files[i]) != 0) return false;
+    }
+    return true;
 }

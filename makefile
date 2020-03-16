@@ -21,8 +21,8 @@ clean:
 
 test: all
 	g++ $(IDIR) -I./Catch2/single_include/catch2 -c $(TDIR)/tests.cpp -o $(ODIR)/tests.o
-	g++ $(TDIR)/tests.o $(ODIR)/simpledu_args.o -o $(ODIR)/$(TEXE)
-	$(TDIR)/tests
+	g++ $(ODIR)/tests.o $(ODIR)/simpledu_args.o -o $(ODIR)/$(TEXE)
+	$(ODIR)/$(TEXE)
 
 makefolders:
 	mkdir -p $(ODIR)
