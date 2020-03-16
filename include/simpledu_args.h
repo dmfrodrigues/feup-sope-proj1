@@ -53,11 +53,6 @@ typedef struct {
 } simpledu_args_t;
 
 /**
- * @brief Default arguments.
- */
-const simpledu_args_t simpledu_args_default;
-
-/**
  * @brief simpledu_args constructor.
  * 
  * @param p     Pointer to simpledu_args_t to construct

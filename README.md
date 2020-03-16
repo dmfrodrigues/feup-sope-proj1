@@ -9,10 +9,17 @@
     - João António Cardoso Vieira e Basto de Sousa (up201806613@fe.up.pt)
     - Rafael Soares Ribeiro (up201806330@fe.up.pt)
 
-## Compile
+## Make commands
+### Compile
 
 ```sh
 make
+```
+
+### Test
+
+```sh
+make test
 ```
 
 ### Cleanup
