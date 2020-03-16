@@ -15,11 +15,10 @@ clean:
 	rm -f simpledu
 
 makefolders:
-	mkdir -p obj
-	mkdir -p bin
+	mkdir -p $(ODIR)
 
-simpledu:             $(ODIR)/simpledu.o
-	$(CC) $(ODIR)/simpledu.o -o simpledu
+simpledu:             $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o
+	$(CC) $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o -o simpledu
 
 $(ODIR)/%.o:          $(SDIR)/%.c
 	$(CC) $(CFLAGS) -c $^ -o $@
