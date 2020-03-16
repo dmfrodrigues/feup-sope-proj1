@@ -6,7 +6,7 @@ SDIR   =./src
 IDIR   =-I./include
 ODIR   =./obj
 
-CFLAGS =$(IFLAGS)
+CFLAGS =-std=c99 $(IFLAGS)
 
 all: makefolders simpledu
 

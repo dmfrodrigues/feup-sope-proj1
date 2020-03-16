@@ -17,7 +17,6 @@ typedef struct {
      * -b, --bytes
      *  equivalent to '--block-size=1'; write real size in bytes
      */
-    bool bytes;
     /**
      * -B, --blocksize=SIZE
      * scale sizes by SIZE before printing them; defaults to 1024
@@ -43,6 +42,14 @@ typedef struct {
      * print the total for a directory (or file with --all) only if it is N or fewer levels below the command line argument
      */
     int  max_depth;
+    /**
+     * @brief Size of files array.
+     */
+    int filesc;
+    /**
+     * @brief Files to analyse.
+     */
+    char **files;
 } simpledu_args_t;
 
 /**
@@ -52,7 +59,20 @@ const simpledu_args_t simpledu_args_default;
 
 /**
  * @brief simpledu_args constructor.
+ * 
+ * @param p     Pointer to simpledu_args_t to construct
+ * @param argc  Size of argv
+ * @param argv  Arguments passed to program, to fill simpledu_args_t
+ * @return int  EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
  */
 int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]);
+
+/**
+ * @brief simpledu_args destructor.
+ * 
+ * @param p     Pointer to simpledu_args_t to destruct
+ * @return int  EXIT_SUCCESS if successful
+ */
+int simpledu_args_dtor(simpledu_args_t *p);
 
 #endif //SIMPLEDU_ARGS_H
