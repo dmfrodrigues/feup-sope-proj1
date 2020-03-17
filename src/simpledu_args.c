@@ -3,50 +3,59 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <unistd.h>
+#include <getopt.h>
 
 const simpledu_args_t simpledu_args_default = {false, 1024, false, false, false, PATH_MAX/2, 0, NULL};
 
-const char optstring[] = "ablLSBd";
+const char optstring[] = "abLlSB:d:";
+const struct option longopts[] = {
+    {"all"          , 0, NULL, 'a'},
+    {"bytes"        , 0, NULL, 'b'},
+    {"dereference"  , 0, NULL, 'L'},
+    {"count-links"  , 0, NULL, 'l'},
+    {"separate-dirs", 0, NULL, 'S'},
+    {"blocksize"    , 1, NULL, 'B'},
+    {"max-depth"    , 1, NULL, 'd'},
+    {0,0,0,0}
+};
 
-int simpledu_args_ctor(simpledu_args_t *p, int argc, const char * const argv[]){
+int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
     *p = simpledu_args_default;
-    int block_size, max_depth;
-    for(int i = 1; i < argc; ++i){
-        const char *s = argv[i];
-        if(strcmp(s, "-a") == 0 || strcmp(s, "--all"          ) == 0){ p->all           = true; continue; }
-        if(strcmp(s, "-b") == 0 || strcmp(s, "--bytes"        ) == 0){ p->block_size    =    1; continue; }
-        if(strcmp(s, "-l") == 0 || strcmp(s, "--count-links"  ) == 0){ p->count_links   = true; continue; }
-        if(strcmp(s, "-L") == 0 || strcmp(s, "--dereference"  ) == 0){ p->dereference   = true; continue; }
-        if(strcmp(s, "-S") == 0 || strcmp(s, "--separate-dirs") == 0){ p->separate_dirs = true; continue; }
-        if(strcmp(s, "-B") == 0){
-            s = argv[++i];
-            if(sscanf(s, "%llu", &p->block_size) != 1){
-                errno = EINVAL;
-                return EXIT_FAILURE;
-            }
-            continue;
+
+    opterr = 0; optind = 1;
+    int opt = 0; int longindex;
+    while((opt = getopt_long(argc, argv, optstring, longopts, &longindex)) != -1){
+        switch(opt){
+            case 'a': p->all           = true; break;
+            case 'b': p->block_size    =    1; break;
+            case 'L': p->dereference   = true; break;
+            case 'l': p->count_links   = true; break;
+            case 'S': p->separate_dirs = true; break;
+            case 'B': if(sscanf(optarg, "%llu", &p->block_size) != 1) return EXIT_FAILURE; break;
+            case 'd': if(sscanf(optarg, "%hu" , &p->max_depth ) != 1) return EXIT_FAILURE; break;
+            default: opterr = 1; optind = 1; return EXIT_FAILURE;
         }
-        if(sscanf(s, "--blocksize=%d", &block_size) == 1){ p->block_size = block_size; continue; }
-        if(strcmp(s, "-d") == 0){
-            s = argv[++i];
-            if(sscanf(s, "%hu", &p->max_depth) != 1){
-                errno = EINVAL;
-                return EXIT_FAILURE;
-            }
-            continue;
-        }
-        if(sscanf(s, "--max-depth=%d", &max_depth) == 1){ p->max_depth = max_depth; continue; }
-        char *c = malloc(sizeof(char)*(strlen(s)+1));
-        strcpy(c, s);
-        ++p->filesc;
-        p->files = realloc(p->files, sizeof(char*)*p->filesc);
-        p->files[p->filesc-1] = c;
     }
+    opterr = 1;
+
+    p->filesc = argc - optind;
+    p->files  = realloc(p->files, p->filesc*sizeof(char *));
+    for(int i = 0; i < p->filesc; ++i){
+        const char *s = argv[optind+i];
+        char *str = malloc((1+strlen(s)*sizeof(char)));
+        strcpy(str, s);
+        p->files[i] = str;
+    }
+    optind = 1;
+
     if(p->filesc == 0){
-        char *c = ".";
-        ++p->filesc;
-        p->files = realloc(p->files, sizeof(char*)*p->filesc);
-        p->files[p->filesc-1] = c;
+        p->filesc = 1;
+        p->files  = realloc(p->files, p->filesc*sizeof(char *));
+        const char *s = ".";
+        char *str = malloc(2*sizeof(char));
+        strcpy(str, s);
+        p->files[0] = str;
     }
     return EXIT_SUCCESS;
 }

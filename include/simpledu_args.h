@@ -61,7 +61,7 @@ typedef struct {
  * @param argv  Arguments passed to program, to fill simpledu_args_t
  * @return int  EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
  */
-int simpledu_args_ctor(simpledu_args_t *p, int argc, const char * const argv[]);
+int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]);
 
 /**
  * @brief simpledu_args destructor.
