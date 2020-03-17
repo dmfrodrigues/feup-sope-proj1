@@ -6,10 +6,12 @@
 
 const simpledu_args_t simpledu_args_default = {false, 1024, false, false, false, PATH_MAX/2, 0, NULL};
 
+const char optstring[] = "ablLSBd";
+
 int simpledu_args_ctor(simpledu_args_t *p, int argc, const char * const argv[]){
     *p = simpledu_args_default;
     int block_size, max_depth;
-    for(int i = 0; i < argc; ++i){
+    for(int i = 1; i < argc; ++i){
         const char *s = argv[i];
         if(strcmp(s, "-a") == 0 || strcmp(s, "--all"          ) == 0){ p->all           = true; continue; }
         if(strcmp(s, "-b") == 0 || strcmp(s, "--bytes"        ) == 0){ p->block_size    =    1; continue; }

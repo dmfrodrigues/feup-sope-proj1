@@ -10,7 +10,7 @@ ODIR   =./obj
 TDIR   =./test
 TEXE   =test
 
-CFLAGS =-std=c99 -Wall $(IFLAGS)
+CFLAGS =-Wall $(IFLAGS)
 
 all: makefolders $(PROG)
 
@@ -28,8 +28,8 @@ makefolders:
 	mkdir -p $(ODIR)
 	mkdir -p $(TDIR)
 
-$(PROG):             $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o
-	$(CC) $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o -o simpledu
+$(PROG):             $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o
+	$(CC) $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o -o simpledu
 
 $(ODIR)/%.o:          $(SDIR)/%.c
 	$(CC) $(CFLAGS) -c $^ -o $@

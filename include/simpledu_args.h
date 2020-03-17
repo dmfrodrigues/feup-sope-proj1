@@ -1,5 +1,5 @@
-#ifndef SIMPLEDU_ARGS_H
-#define SIMPLEDU_ARGS_H
+#ifndef SIMPLEDU_ARGS_H_INCLUDED
+#define SIMPLEDU_ARGS_H_INCLUDED
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -81,4 +81,4 @@ int simpledu_args_dtor(simpledu_args_t *p);
  */
 bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2);
 
-#endif //SIMPLEDU_ARGS_H
+#endif //SIMPLEDU_ARGS_H_INCLUDED

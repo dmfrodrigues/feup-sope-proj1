@@ -1,4 +1,5 @@
 simpledu
 obj/
 test/test
+.vscode/
 
