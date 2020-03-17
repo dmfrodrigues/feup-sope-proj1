@@ -28,7 +28,7 @@ static int filedes = NOFILEDES;
 int simpledu_log_EXIT(int status){
     if(filedes == -1) return EXIT_SUCCESS;
     double t; if(simpledu_gettime(&t)) return EXIT_FAILURE; 
-    char buff[MAXN]; if(sprintf(buff, "%.2f %d EXIT %d\n", t, getpid(), status) < 0) return EXIT_FAILURE;
+    char buff[MAXN]; if(sprintf(buff, "%.2f %08d EXIT %d\n", t, getpid(), status) < 0) return EXIT_FAILURE;
     if(write(filedes, buff, strlen(buff)) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
@@ -45,7 +45,7 @@ int simpledu_log_EXIT(int status){
 int simpledu_log_SEND_SIGNAL(int sig, pid_t pid){
     if(filedes == -1) return EXIT_SUCCESS;
     double t; if(simpledu_gettime(&t)) return EXIT_FAILURE; 
-    char buff[MAXN]; if(sprintf(buff, "%.2f %d SEND_SIGNAL %d %d\n", t, getpid(), sig, pid) < 0) return EXIT_FAILURE;
+    char buff[MAXN]; if(sprintf(buff, "%.2f %08d SEND_SIGNAL %d %d\n", t, getpid(), sig, pid) < 0) return EXIT_FAILURE;
     if(write(filedes, buff, strlen(buff)) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
@@ -53,7 +53,7 @@ int simpledu_log_SEND_SIGNAL(int sig, pid_t pid){
 int simpledu_log_CREATE(int argc, const char* const argv[]){
     if(filedes == -1) return EXIT_SUCCESS;
     double t; if(simpledu_gettime(&t)) return EXIT_FAILURE; 
-    char buff[MAXN]; if(sprintf(buff, "%.2f %d CREATE", t, getpid()) < 0) return EXIT_FAILURE;
+    char buff[MAXN]; if(sprintf(buff, "%.2f %08d CREATE", t, getpid()) < 0) return EXIT_FAILURE;
     for(int i = 0; i < argc; ++i) strcat(buff, argv[i]);
     strcat(buff, "\n");
     if(write(filedes, buff, strlen(buff)) == -1) return EXIT_FAILURE;
@@ -63,7 +63,7 @@ int simpledu_log_CREATE(int argc, const char* const argv[]){
 int simpledu_log_RECV_SIGNAL(int sig){
     if(filedes == -1) return EXIT_SUCCESS;
     double t; if(simpledu_gettime(&t)) return EXIT_FAILURE; 
-    char buff[MAXN]; if(sprintf(buff, "%.2f %d RECV_SIGNAL %d\n", t, getpid(), sig) < 0) return EXIT_FAILURE;
+    char buff[MAXN]; if(sprintf(buff, "%.2f %08d RECV_SIGNAL %d\n", t, getpid(), sig) < 0) return EXIT_FAILURE;
     if(write(filedes, buff, strlen(buff)) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
@@ -71,7 +71,7 @@ int simpledu_log_RECV_SIGNAL(int sig){
 int simpledu_log_ENTRY(long long unsigned size, const char *path){
     if(filedes == -1) return EXIT_SUCCESS;
     double t; if(simpledu_gettime(&t)) return EXIT_FAILURE; 
-    char buff[MAXN]; if(sprintf(buff, "%.2f %d RECV_SIGNAL %llu %s\n", t, getpid(), size, path) < 0) return EXIT_FAILURE;
+    char buff[MAXN]; if(sprintf(buff, "%.2f %08d ENTRY %llu %s\n", t, getpid(), size, path) < 0) return EXIT_FAILURE;
     if(write(filedes, buff, strlen(buff)) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
