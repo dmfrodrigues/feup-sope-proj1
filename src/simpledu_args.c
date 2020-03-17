@@ -6,10 +6,10 @@
 #include <unistd.h>
 #include <getopt.h>
 
-const simpledu_args_t simpledu_args_default = {false, 1024, false, false, false, PATH_MAX/2, 0, NULL};
+static const simpledu_args_t simpledu_args_default = {false, 1024, false, false, false, PATH_MAX/2, 0, NULL};
 
-const char optstring[] = "abLlSB:d:";
-const struct option longopts[] = {
+static const char optstring[] = "abLlSB:d:";
+static const struct option longopts[] = {
     {"all"          , 0, NULL, 'a'},
     {"bytes"        , 0, NULL, 'b'},
     {"dereference"  , 0, NULL, 'L'},
