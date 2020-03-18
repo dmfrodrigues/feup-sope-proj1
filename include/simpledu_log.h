@@ -13,6 +13,14 @@
 int simpledu_log_createlog(const char * filename);
 
 /**
+ * @brief Set file descriptor to logfile if it already exists.
+ * 
+ * @param filedes   File descriptor of logfile
+ * @return int      EXIT_SUCCESS if successful
+ */
+int simpledu_log_setfiledes(int fildes);
+
+/**
  * @brief Log a CREATE action.
  * 
  * Should be used right after entering main.

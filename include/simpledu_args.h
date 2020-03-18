@@ -44,6 +44,11 @@ typedef struct {
      */
     unsigned short max_depth;
     /**
+     * -f, --log-filedes
+     * set file descriptor of log file; should only be used by subprocesses
+     */
+    int log_filedes;
+    /**
      * @brief Size of files array.
      */
     size_t filesc;
@@ -72,7 +77,7 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]);
 int simpledu_args_dtor(simpledu_args_t *p);
 
 /**
- * @brief Compare two simpledu_args_t instances of equality.
+ * @brief Compare two simpledu_args_t instances for equality.
  * 
  * @param p1        First argument
  * @param p2        Second argument
@@ -80,5 +85,7 @@ int simpledu_args_dtor(simpledu_args_t *p);
  * @return false    Otherwise
  */
 bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2);
+
+int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv);
 
 #endif //SIMPLEDU_ARGS_H_INCLUDED

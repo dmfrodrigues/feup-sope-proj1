@@ -6,9 +6,9 @@
 #include <unistd.h>
 #include <getopt.h>
 
-static const simpledu_args_t simpledu_args_default = {false, 1024, false, false, false, PATH_MAX/2, 0, NULL};
+static const simpledu_args_t simpledu_args_default = {false, 1024, false, false, false, PATH_MAX/2, -1, 0, NULL};
 
-static const char optstring[] = "abLlSB:d:";
+static const char optstring[] = "abLlSB:d:f:";
 static const struct option longopts[] = {
     {"all"          , 0, NULL, 'a'},
     {"bytes"        , 0, NULL, 'b'},
@@ -17,11 +17,22 @@ static const struct option longopts[] = {
     {"separate-dirs", 0, NULL, 'S'},
     {"blocksize"    , 1, NULL, 'B'},
     {"max-depth"    , 1, NULL, 'd'},
+    {"log-filedes"  , 1, NULL, 'f'},
     {0,0,0,0}
 };
 
 int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
+
+    printf("argc=%d\n", argc);
+    for(int i = 0; i < argc; ++i){
+        printf("%s\n", argv[i]);
+    }
+    printf("%d\n", argv[argc]);
+
+    if(p == NULL){ errno = EINVAL; return EXIT_FAILURE; }
     *p = simpledu_args_default;
+
+    printf("L35\n");
 
     opterr = 0; optind = 1;
     int opt = 0; int longindex;
@@ -32,8 +43,9 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
             case 'L': p->dereference   = true; break;
             case 'l': p->count_links   = true; break;
             case 'S': p->separate_dirs = true; break;
-            case 'B': if(sscanf(optarg, "%llu", &p->block_size) != 1) return EXIT_FAILURE; break;
-            case 'd': if(sscanf(optarg, "%hu" , &p->max_depth ) != 1) return EXIT_FAILURE; break;
+            case 'B': if(sscanf(optarg, "%llu", &p->block_size ) != 1) return EXIT_FAILURE; break;
+            case 'd': if(sscanf(optarg, "%hu" , &p->max_depth  ) != 1) return EXIT_FAILURE; break;
+            case 'f': if(sscanf(optarg, "%d"  , &p->log_filedes) != 1) return EXIT_FAILURE; break;
             default: opterr = 1; optind = 1; return EXIT_FAILURE;
         }
     }
@@ -56,11 +68,12 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
         char *str = malloc(2*sizeof(char));
         strcpy(str, s);
         p->files[0] = str;
-    }
+    }  printf("L71\n");
     return EXIT_SUCCESS;
 }
 
 int simpledu_args_dtor(simpledu_args_t *p){
+    if(p == NULL) return EXIT_SUCCESS;
     for(int i = 0; i < p->filesc; ++i) free(p->files[i]);
     free(p->files);
     return EXIT_SUCCESS;
@@ -82,4 +95,34 @@ bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2){
         if(strcmp(p1->files[i], p2->files[i]) != 0) return false;
     }
     return true;
+}
+
+#define TOARGV_MIN_ARGC 8
+#define TOARGV_BUF_SIZE 4096
+
+int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv){
+    if(p == NULL){ errno = EINVAL; return EXIT_FAILURE; }
+
+    char **argv = malloc((TOARGV_MIN_ARGC+p->filesc+1)*sizeof(char *));
+    
+    char buf[TOARGV_BUF_SIZE];
+    int i = 0;
+    {                     strcpy(buf, "./simpledu"   ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //Program name
+    if(p->all          ){ strcpy(buf, "-a"           ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-a, --all
+    { sprintf(buf, "--blocksize=%llu" , p->block_size); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-B, --blocksize
+    if(p->count_links  ){ strcpy(buf, "-l"           ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-l, --count-links
+    if(p->dereference  ){ strcpy(buf, "-L"           ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-L, --dereference
+    if(p->separate_dirs){ strcpy(buf, "-S"           ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-S, --separate-dirs
+    { sprintf(buf, "--max-depth=%hu" , p->max_depth  ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-d, --max-depth
+    { sprintf(buf, "--log-filedes=%d", p->log_filedes); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //log_filedes
+
+    for(int j = 0; j < p->filesc; ++i, ++j){
+        argv[i] = malloc((strlen(p->files[j])+1)*sizeof(char));
+        strcpy(argv[i], p->files[j]);
+    }
+
+    argv[i++] = NULL;
+
+    *pargv = argv;
+    return EXIT_SUCCESS;
 }
