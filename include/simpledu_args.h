@@ -49,6 +49,11 @@ typedef struct {
      */
     int log_filedes;
     /**
+     * -p, --pipe-filedes
+     * set file descriptor to pipe to communicate with parent; should only be used by subprocesses
+     */
+    int pipe_filedes;
+    /**
      * @brief Size of files array.
      */
     size_t filesc;

@@ -1,6 +1,7 @@
 simpledu
 obj/
 test/test
-.vscode/
+.vscode/*
+!.vscode/launch.json
 *.log
 
