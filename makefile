@@ -20,10 +20,12 @@ clean:
 	rm -f $(PROG)
 
 test: all
-	g++ -g $(IDIR) -I./Catch2/single_include/catch2 -c $(TDIR)/tests.cpp -o $(ODIR)/tests.o
-	g++ -g $(ODIR)/tests.o $(ODIR)/simpledu_args.o -o $(ODIR)/$(TEXE)
-	#$(ODIR)/$(TEXE)
-	valgrind --leak-check=yes $(ODIR)/$(TEXE)
+	$(CC) $(CFLAGS) -c -I./acutest/include $(TDIR)/tests.c -o $(ODIR)/tests.o
+	$(CC) $(ODIR)/tests.o $(ODIR)/simpledu_args.o -o $(ODIR)/$(TEXE)
+	$(ODIR)/$(TEXE)
+
+check: all test
+	#valgrind --leak-check=yes $(ODIR)/$(TEXE)
 
 makefolders:
 	mkdir -p $(ODIR)
