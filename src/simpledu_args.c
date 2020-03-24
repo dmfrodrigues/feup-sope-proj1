@@ -45,22 +45,22 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
     opterr = 1;
 
     p->filesc = argc - optind;
-    p->files  = malloc(p->filesc*sizeof(char *));
-    if(p->files == NULL) return EXIT_FAILURE;
-    for(int i = 0; i < p->filesc; ++i){
-        const char *s = argv[optind+i];
-        char *str = malloc((1+strlen(s)*sizeof(char)));
-        if(str == NULL){
-            for(int j = 0; j < i; ++j) free(p->files[i]);
-            free(p->files);
-            return EXIT_FAILURE;
+    if(p->filesc != 0) {
+        p->files  = malloc(p->filesc*sizeof(char *));
+        if(p->files == NULL) return EXIT_FAILURE;
+        for(int i = 0; i < p->filesc; ++i){
+            const char *s = argv[optind+i];
+            char *str = malloc((1+strlen(s)*sizeof(char)));
+            if(str == NULL){
+                for(int j = 0; j < i; ++j) free(p->files[i]);
+                free(p->files);
+                return EXIT_FAILURE;
+            }
+            strcpy(str, s);
+            p->files[i] = str;
         }
-        strcpy(str, s);
-        p->files[i] = str;
-    }
-    optind = 1;
-
-    if(p->filesc == 0){
+        optind = 1;
+    } else {
         p->filesc = 1;
         p->files  = malloc(p->filesc*sizeof(char *));
         if(p->files == NULL) return EXIT_FAILURE;
