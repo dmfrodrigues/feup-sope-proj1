@@ -45,10 +45,16 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
     opterr = 1;
 
     p->filesc = argc - optind;
-    p->files  = realloc(p->files, p->filesc*sizeof(char *));
+    p->files  = malloc(p->filesc*sizeof(char *));
+    if(p->files == NULL) return EXIT_FAILURE;
     for(int i = 0; i < p->filesc; ++i){
         const char *s = argv[optind+i];
         char *str = malloc((1+strlen(s)*sizeof(char)));
+        if(str == NULL){
+            for(int j = 0; j < i; ++j) free(p->files[i]);
+            free(p->files);
+            return EXIT_FAILURE;
+        }
         strcpy(str, s);
         p->files[i] = str;
     }
@@ -56,9 +62,14 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
 
     if(p->filesc == 0){
         p->filesc = 1;
-        p->files  = realloc(p->files, p->filesc*sizeof(char *));
+        p->files  = malloc(p->filesc*sizeof(char *));
+        if(p->files == NULL) return EXIT_FAILURE;
         const char *s = ".";
         char *str = malloc(2*sizeof(char));
+        if(str == NULL){
+            free(p->files);
+            return EXIT_FAILURE;
+        }
         strcpy(str, s);
         p->files[0] = str;
     }
@@ -67,8 +78,12 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
 
 int simpledu_args_dtor(simpledu_args_t *p){
     if(p == NULL) return EXIT_SUCCESS;
-    for(int i = 0; i < p->filesc; ++i) free(p->files[i]);
+    for(int i = 0; i < p->filesc; ++i){
+        free(p->files[i]);
+        p->files[i] = NULL;
+    }
     free(p->files);
+    p->files = NULL;
     return EXIT_SUCCESS;
 }
 
