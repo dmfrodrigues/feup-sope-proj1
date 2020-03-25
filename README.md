@@ -1,7 +1,7 @@
 # simpledu
 
 <p align="left">
-  <img src="https://github.com/dmfrodrigues/feup-sope-proj1/workflows/check/badge.svg">
+  <img src="https://github.com/dmfrodrigues/feup-sope-proj1/workflows/test/badge.svg">
 </p>
 
 - **Project name:** simpledu
