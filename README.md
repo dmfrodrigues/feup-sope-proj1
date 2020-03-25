@@ -1,5 +1,9 @@
 # simpledu
 
+<p align="center">
+  <img src="https://github.com/dmfrodrigues/feup-sope-proj1/workflows/C%20basic/badge.svg">
+</p>
+
 - **Project name:** simpledu
 - **Short description:** Clone of Unix command `du`, supporting most relevant options
 - **Institution:** FEUP
