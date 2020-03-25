@@ -24,8 +24,8 @@ test: all
 	$(CC) $(ODIR)/tests.o $(ODIR)/simpledu_args.o -o $(ODIR)/$(TEXE)
 	$(ODIR)/$(TEXE)
 
-check: all test
-	#valgrind --leak-check=yes $(ODIR)/$(TEXE)
+testmem:
+	valgrind --leak-check=yes $(ODIR)/$(TEXE)
 
 makefolders:
 	mkdir -p $(ODIR)
