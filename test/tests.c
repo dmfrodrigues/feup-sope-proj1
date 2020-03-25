@@ -93,7 +93,7 @@ void test_simpledu_args_equal(void){
         TEST_CHECK(!simpledu_args_equal(&a1, &a2));
         for (int i = 0; i < argc; ++i) free(argv[i]);
         for (int i = 0; i < argc; ++i) free(argv2[i]);
-        TEST_CHECK(simpledu_args_dtor(&a1) != EXIT_SUCCESS);
+        TEST_CHECK(simpledu_args_dtor(&a1) == EXIT_SUCCESS);
         TEST_CHECK(simpledu_args_dtor(&a2) == EXIT_SUCCESS);
     }
 }
