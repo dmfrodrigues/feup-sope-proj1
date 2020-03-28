@@ -9,16 +9,15 @@ off_t simpledu_stat(const char *path, off_t blocksize){
 }
 
 
-bool simpledu_symb_link(const char *path) {
+int simpledu_symb_link(const char *path) {
     struct stat buf;
     if(lstat(path, &buf)) return -1;
     return S_ISLNK(buf.st_mode);
 }
 
-
-bool simpledu_dir(const char *path) {
+int simpledu_dir(const char *path) {
     struct stat buf;
-    if(stat(path, &buf)) return -1;
+    if(stat(path, &buf)) return 0;
     return S_ISDIR(buf.st_mode);
 }
 

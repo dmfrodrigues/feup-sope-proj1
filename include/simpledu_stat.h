@@ -20,28 +20,25 @@ off_t simpledu_stat(const char *path, off_t blocksize);
  * @brief Check if a file is a symbolic link or not.
  * 
  * @param path      Path of file
- * @return true     If symbolic link
- * @return false    Otherwise
+ * @return int      1 if symbolic link; -1 in case of error; 0 otherwise
  */
-bool simpledu_symb_link(const char *path);
+int simpledu_symb_link(const char *path);
 
 /**
  * @brief Check if a file is a directory or not.
  * 
  * @param path      Path of file
- * @return true     If directory
- * @return false    Otherwise
+ * @return int      1 if directory; -1 in case of error; 0 otherwise
  */
-bool simpledu_dir(const char *path);
+int simpledu_dir(const char *path);
 
 /**
- * @brief Check if a file is a regular file or not.
+ * @brief           Check if a file is a regular file or not.
  * 
  * @param path      Path of file
- * @return true     If regular file
- * @return false    Otherwise
+ * @return int      1 if regular file; -1 in case of error; 0 otherwise
  */
-bool simpledu_reg_file(const char *path);
+int simpledu_reg_file(const char *path);
 
 
 /**
