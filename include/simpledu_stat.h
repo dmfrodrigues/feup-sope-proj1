@@ -34,7 +34,14 @@ bool simpledu_symb_link(const char *path);
  */
 bool simpledu_dir(const char *path);
 
-
+/**
+ * @brief Check if a file is a regular file or not.
+ * 
+ * @param path      Path of file
+ * @return true     If regular file
+ * @return false    Otherwise
+ */
+bool simpledu_reg_file(const char *path);
 
 
 #endif //SIMPLEDU_STAT_H_INCLUDED

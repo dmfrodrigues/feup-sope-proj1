@@ -21,3 +21,10 @@ bool simpledu_dir(const char *path) {
     if(stat(path, &buf)) return -1;
     return S_ISDIR(buf.st_mode);
 }
+
+
+bool simpledu_reg_file(const char *path) {
+    struct stat buf;
+    if(stat(path, &buf)) return -1;
+    return S_ISREG(buf.st_mode);
+}
