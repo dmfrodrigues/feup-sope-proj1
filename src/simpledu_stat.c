@@ -22,9 +22,15 @@ bool simpledu_dir(const char *path) {
     return S_ISDIR(buf.st_mode);
 }
 
-
-bool simpledu_reg_file(const char *path) {
+int simpledu_reg_file(const char *path) {
     struct stat buf;
-    if(stat(path, &buf)) return -1;
+    if(stat(path, &buf)) return 0;
     return S_ISREG(buf.st_mode);
 }
+
+long long simpledu_file_size(const char *path) {
+    struct stat buf;
+    if(stat(path, &buf)) return -1;
+    return S_ISREG(buf.st_size);
+}
+

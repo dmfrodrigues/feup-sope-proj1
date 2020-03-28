@@ -44,4 +44,12 @@ bool simpledu_dir(const char *path);
 bool simpledu_reg_file(const char *path);
 
 
+/**
+ * @brief Gives the number of bytes of a file.
+ * 
+ * @param path      Path of file
+ * @return int      File Size in bytes; -1 in case of error
+ */
+long long simpledu_file_size(const char *path);
+
 #endif //SIMPLEDU_STAT_H_INCLUDED
