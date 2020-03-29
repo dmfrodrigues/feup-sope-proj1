@@ -31,14 +31,7 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
 
         // if dir
         if (simpledu_dir(dir_point->d_name)) {
-            // process it
-            /*
-                Use execle ?
-
-                int execle(const char *pathname, const char *arg, ...
-                          (char *) NULL,         char *const envp[]);
-            */
-
+            
             //Must deal with dir_to_iter being open before doing fork (dont know how yet)
 
             int pid = fork();
