@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include <linux/limits.h>
+#include <limits.h>
 
 /**
  * @brief Holds all argument options with which 'simpledu' was called.
