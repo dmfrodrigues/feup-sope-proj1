@@ -8,6 +8,7 @@
 #include "simpledu_envp.h"
 #include "simpledu_time.h"
 #include "simpledu_log.h"
+#include "unnamed_functions.h"
 
 #define FILEDES_INVALID -1
 
@@ -67,7 +68,11 @@ int main(int argc, char *argv[], char *envp[]){
         simpledu_exit(EXIT_FAILURE);
     }
     */
-    
+    char path[PATH_MAX];
+    int pipe_id;
+
+    simpledu_iterate(path, &pipe_id, arg, envp);
+
     simpledu_clean();
     simpledu_exit(EXIT_SUCCESS);
 }
