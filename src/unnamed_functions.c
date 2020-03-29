@@ -1,6 +1,7 @@
 #include "unnamed_functions.h"
 #include "simpledu_stat.h"
-#include "simpledu_args.h"
+#include "simpledu_log.h"
+
 #include <sys/stat.h>
 
 
@@ -49,7 +50,7 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
         }
 
         // if symbolic link
-        else if (simpledu_symb_link(dir_point->d_name)) {
+        else if (arg.dereference && simpledu_symb_link(dir_point->d_name)) {
             // only check if argument -L was passed
         }
 
