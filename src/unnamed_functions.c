@@ -7,6 +7,8 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <limits.h>
+#include <unistd.h>
+
 
 
 int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char *envp[]) {
@@ -65,11 +67,32 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
         }
 
         // if symbolic link
-        else if (arg.dereference && simpledu_symb_link(dir_point->d_name)) {
-            // only check if argument -L was passed
+        else if (simpledu_symb_link(dir_point->d_name)) {
+            
+            if (arg.dereference) {
+                // to dereference
+                // placeholder code
+                char symb_link_buf[PATH_MAX];
+                ssize_t len = readlink(dir_point->d_name, symb_link_buf, sizeof(symb_link_buf)-1);
+                
+                // if no error occured
+                if (len != -1)
+                    symb_link_buf[len] = '\0';
+
+                // symb_link_buf -> Path of symb link
+
+                // display it
+                
+            }
+
+            else {
+                // as if it was a regular file (copy from the corresponding if when that is complete)
+            }
         }
 
         // if regular file
+        // TODO dont think the size or the formatting correspond to those of the du command...
+        // still don't know how to fix it -_-
         else if (simpledu_reg_file(dir_point->d_name)) {
             // display size and relative path/(name)
             // Placeholder code. Make it display full relative path from "starting" directory
