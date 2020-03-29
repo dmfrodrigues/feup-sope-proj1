@@ -23,21 +23,28 @@ int simpledu_iterate(const char *path, int *pipe_pid) {
         if (simpledu_dir(dir_point->d_name)) {
             // process it
             /*
+                Use execle ?
 
+                int execle(const char *pathname, const char *arg, ...
+                          (char *) NULL,         char *const envp[]);
             */
         }
-
+        
         // if symbolic link
         else if (simpledu_symb_link(dir_point->d_name)) {
-
-
+            // only check if argument -L was passed
         }
 
         // if regular file
         else if (simpledu_reg_file(dir_point->d_name)) {
-            // display relative path/(name)
-            // display size
 
+            // display size
+            long long file_size = simpledu_file_size(dir_point->d_name);
+            printf("%lld", file_size);
+            
+            // display relative path/(name)
+            // Placeholder code. Make it display full relative path from "starting" directory
+            printf("%s", dir_point->d_name);
         }
 
     }
