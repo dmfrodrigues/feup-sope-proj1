@@ -3,6 +3,10 @@
 #include "simpledu_log.h"
 
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <string.h>
+#include <limits.h>
 
 
 int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char *envp[]) {
@@ -36,15 +40,26 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
             //Must deal with dir_to_iter being open before doing fork (dont know how yet)
 
             int pid = fork();
+            int status;
+
             if (pid > 0) { //parent
+                //Will receive results from pipe here
+                waitpid(pid, &status, 0);
+
+                //Display results from children here
 
             } else if (pid == 0) { //child
+                char new_path[PATH_MAX];
+                strcpy(new_path, dir_point->d_name);
+                strcat(new_path, "/simpledu");  
+
                 if (arg.max_depth > 0) --arg.max_depth;
                 char **new_argv = NULL;
                 if (simpledu_args_toargv(&arg, &new_argv)) simpledu_exit(EXIT_FAILURE);
-                if (execve(dir_point->d_name, new_argv, envp)) simpledu_exit(EXIT_FAILURE);
+                if (execve(new_path, new_argv, envp)) simpledu_exit(EXIT_FAILURE);
 
             } else {
+                // Should it exit with this?
                 simpledu_exit(EXIT_FAILURE);
             }
         }
@@ -74,6 +89,6 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
         printf("%lld\t%s\n", result,  path);
     }
     
-
+    closedir(dir_to_iter);
     return EXIT_SUCCESS;
 }
