@@ -42,7 +42,7 @@ typedef struct {
      * -d, --max-depth=N
      * print the total for a directory (or file with --all) only if it is N or fewer levels below the command line argument
      */
-    unsigned short max_depth;
+    short max_depth;
     /**
      * -f, --log-filedes
      * set file descriptor of log file; should only be used by subprocesses

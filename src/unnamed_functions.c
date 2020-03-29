@@ -53,7 +53,7 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
                 strcpy(new_path, dir_point->d_name);
                 strcat(new_path, "/simpledu");  
 
-                if (arg.max_depth > 0) --arg.max_depth;
+                if (arg.max_depth >= 0) --arg.max_depth;
                 char **new_argv = NULL;
                 if (simpledu_args_toargv(&arg, &new_argv)) simpledu_exit(EXIT_FAILURE);
                 if (execve(new_path, new_argv, envp)) simpledu_exit(EXIT_FAILURE);
