@@ -77,7 +77,7 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
 
             //If it needs to display file size
             if (arg.max_depth > 0 && arg.all){
-                printf("%lld\t%s\n", file_size,  dir_point->d_name);
+                printf("%lld\t%s\n", (long long) file_size,  dir_point->d_name);
             }
         }
 
