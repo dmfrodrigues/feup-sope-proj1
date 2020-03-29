@@ -70,8 +70,10 @@ int main(int argc, char *argv[], char *envp[]){
     */
     char path[PATH_MAX];
     int pipe_id;
-
-    simpledu_iterate(path, &pipe_id, arg, envp);
+    for (size_t i = 0 ; i < arg.filesc ; ++i){
+        strcpy(path, arg.files[i]);
+        simpledu_iterate(path, &pipe_id, arg, envp);
+    }
 
     simpledu_clean();
     simpledu_exit(EXIT_SUCCESS);

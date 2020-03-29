@@ -73,8 +73,7 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
         else if (simpledu_reg_file(dir_point->d_name)) {
             // display size and relative path/(name)
             // Placeholder code. Make it display full relative path from "starting" directory
-            long long file_size = simpledu_file_size(dir_point->d_name);
-            result += file_size / arg.block_size;
+            off_t file_size = simpledu_stat(dir_point->d_name, arg.block_size);
 
             //If it needs to display file size
             if (arg.max_depth > 0 && arg.all){
@@ -85,7 +84,7 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
     }
 
     //After iterating over directory, will try to display results
-    if (arg.max_depth > 0){
+    if (arg.max_depth >= 0){
         printf("%lld\t%s\n", result,  path);
     }
     
