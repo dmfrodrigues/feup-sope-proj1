@@ -47,6 +47,6 @@ int simpledu_reg_file(const char *path);
  * @param path      Path of file
  * @return int      File Size in bytes; -1 in case of error
  */
-long long simpledu_file_size(const char *path);
+off_t simpledu_file_size(const char *path);
 
 #endif //SIMPLEDU_STAT_H_INCLUDED

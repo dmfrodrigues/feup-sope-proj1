@@ -27,7 +27,7 @@ int simpledu_reg_file(const char *path) {
     return S_ISREG(buf.st_mode);
 }
 
-long long simpledu_file_size(const char *path) {
+off_t simpledu_file_size(const char *path) {
     struct stat buf;
     if(stat(path, &buf)) return -1;
     return buf.st_size;
