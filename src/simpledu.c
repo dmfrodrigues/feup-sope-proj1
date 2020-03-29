@@ -50,6 +50,8 @@ int main(int argc, char *argv[], char *envp[]){
 
     if(simpledu_log_CREATE(argc, (const char * const*)argv)) simpledu_exit(EXIT_FAILURE);
 
+    // DO NOT UNCOMMENT
+    
     /*
     int pid = fork();
     if(pid > 0){ //parent
