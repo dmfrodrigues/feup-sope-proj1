@@ -9,6 +9,6 @@
 
 #include "simpledu_args.h"
 
-int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char *envp[]);
+int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]);
 
 #endif //UNNAMED_FUNCTIONS_H_INCLUDED

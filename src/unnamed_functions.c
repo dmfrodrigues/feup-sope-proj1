@@ -11,15 +11,20 @@
 
 
 
-int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char *envp[]) {
+int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
     //Sum of all file sizes in directory iteration
     //This number will be sent to father process' pipe
     long long result = 0;
 
+    //Get path from environment variable PWD
+    char *path = getenv("PWD");
+
+    //If no files are given as arguments, will evaluate all files on directory by default
+    bool evaluate_all_files = true;
 
     // check if the path given is a directory
-    if (!simpledu_dir(path)) return -1;
+    if (!simpledu_dir(path)) return EXIT_FAILURE;
 
     DIR *dir_to_iter;
 
@@ -31,10 +36,28 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
     }
 
 
-    // if nothing to show printf "." ?
+    if (arg.filesc > 1){ //Will only evaluate the given files
+        evaluate_all_files = false;
+    }
 
     // Iterating over the items of a directory
     while ( (dir_point = readdir(dir_to_iter)) != NULL) {
+
+        char new_path[PATH_MAX];
+        sprintf(new_path, "%s/%s", path, dir_point->d_name);
+
+        //Shitty solution but should work 
+        bool skip_this_file = true;
+
+        if (!evaluate_all_files){
+            for (size_t i = 0 ; i < arg.filesc ; ++i){
+                if (arg.files[i] == dir_point->d_name){ //Found this file in the list
+                    skip_this_file = false;
+                    break;
+                }
+            }
+            if (skip_this_file) break;
+        }
 
         // if dir
         if (simpledu_dir(dir_point->d_name)) {
@@ -51,18 +74,39 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
                 //Display results from children here
 
             } else if (pid == 0) { //child
-                char new_path[PATH_MAX];
-                strcpy(new_path, dir_point->d_name);
-                strcat(new_path, "/simpledu");  
 
-                if (arg.max_depth >= 0) --arg.max_depth;
                 char **new_argv = NULL;
-                if (simpledu_args_toargv(&arg, &new_argv)) simpledu_exit(EXIT_FAILURE);
-                if (execve(new_path, new_argv, envp)) simpledu_exit(EXIT_FAILURE);
+                simpledu_args_t new_arg = arg;
+
+                //Updating arg's files (will only be '.')
+                new_arg.filesc = 1;
+                new_arg.files = malloc(new_arg.filesc * sizeof(char *));
+                if (new_arg.files == NULL) return EXIT_FAILURE;
+                const char *s = ".";
+                char *str = malloc(2 * sizeof(char));
+                if (str == NULL) {
+                    free(new_arg.files);
+                    return EXIT_FAILURE;
+                }
+                strcpy(str, s);
+                new_arg.files[0] = str;
+
+                //Making envp for new process
+                char pwd[PATH_MAX];
+                sprintf(pwd, "PWD=%s", new_path);
+                char *envList[] = {pwd, NULL}; 
+
+                //Path to subdirectory
+                strcat(new_path, "/simpledu");
+
+                //Updating max_depth
+                if (new_arg.max_depth >= 0) --new_arg.max_depth;
+
+                if (simpledu_args_toargv(&new_arg, &new_argv)) return EXIT_FAILURE;
+                if (execve(new_path, new_argv, envList)) return EXIT_FAILURE;
 
             } else {
-                // Should it exit with this?
-                simpledu_exit(EXIT_FAILURE);
+                return EXIT_FAILURE;
             }
         }
 
@@ -99,7 +143,7 @@ int simpledu_iterate(const char *path, int *pipe_pid, simpledu_args_t arg, char 
             off_t file_size = simpledu_stat(dir_point->d_name, arg.block_size);
 
             //If it needs to display file size
-            if (arg.max_depth > 0 && arg.all){
+            if (arg.max_depth >= 0 && arg.all){
                 printf("%lld\t%s\n", (long long) file_size,  dir_point->d_name);
             }
         }

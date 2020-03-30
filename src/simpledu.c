@@ -68,13 +68,9 @@ int main(int argc, char *argv[], char *envp[]){
         simpledu_exit(EXIT_FAILURE);
     }
     */
-    char path[PATH_MAX];
-    int pipe_id;
-    for (size_t i = 0 ; i < arg.filesc ; ++i){
-        strcpy(path, arg.files[i]);
-        simpledu_iterate(path, &pipe_id, arg, envp);
-    }
 
+    int pipe_id;
+    
     simpledu_clean();
-    simpledu_exit(EXIT_SUCCESS);
+    simpledu_exit(simpledu_iterate(&pipe_id, arg, envp));
 }
