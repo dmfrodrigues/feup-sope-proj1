@@ -44,12 +44,12 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
     // Iterating over the items of a directory
     while ( (dir_point = readdir(dir_to_iter)) != NULL) {
         char new_path[PATH_MAX];
-        sprintf(new_path, "%s/%s", path, dir_point->d_name);
+        //sprintf(new_path, "%s/%s", path, dir_point->d_name);
 
         //Dont know if this is needed, just in case
-        if (strcmp(dir_point->d_name, BACK_DIRECTORY) == 0) continue;
+        if (strcmp(dir_point->d_name, BACK_DIRECTORY) == 0 || strcmp(dir_point->d_name, CURRENT_DIRECTORY) == 0) continue;
 
-        printf("File is %s ; Path:%s\n", dir_point->d_name, new_path);
+        printf("%s\n", new_path);
 
         //Shitty solution but should work 
         bool skip_this_file = true;
@@ -65,7 +65,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
         }
 
         // if dir
-        if (simpledu_dir(dir_point->d_name) && strcmp(dir_point->d_name, CURRENT_DIRECTORY) != 0) {
+        if (simpledu_dir(dir_point->d_name)) {
             
             //Must deal with dir_to_iter being open before doing fork (dont know how yet)
 
