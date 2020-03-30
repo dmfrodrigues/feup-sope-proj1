@@ -69,8 +69,12 @@ int main(int argc, char *argv[], char *envp[]){
     }
     */
 
+
+
+
+
     int pipe_id;
-    
+    int result = simpledu_iterate(&pipe_id, arg, envp);
     simpledu_clean();
-    simpledu_exit(simpledu_iterate(&pipe_id, arg, envp));
+    simpledu_exit(result);
 }

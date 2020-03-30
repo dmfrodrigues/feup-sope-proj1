@@ -9,8 +9,8 @@
 #include <limits.h>
 #include <unistd.h>
 
-static const char *BACK_DIRECTORY = "..";
-static const char *CURRENT_DIRECTORY = ".";
+static const char BACK_DIRECTORY[] = "..";
+static const char CURRENT_DIRECTORY[] = ".";
 
 int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
@@ -38,6 +38,10 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
 
     if (arg.filesc > 1){ //Will only evaluate the given files
+        //printf("\n\nGIVEN MORE THAN ONE FILE\n\n");
+        evaluate_all_files = false;
+    } else if (strcmp(arg.files[0], CURRENT_DIRECTORY) != 0) {
+        //printf("\n\nGIVEN ONE FILE\n\n");
         evaluate_all_files = false;
     }
 
@@ -49,23 +53,24 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
         //Dont know if this is needed, just in case
         if (strcmp(dir_point->d_name, BACK_DIRECTORY) == 0 || strcmp(dir_point->d_name, CURRENT_DIRECTORY) == 0) continue;
 
-        printf("%s\n", new_path);
-
         //Shitty solution but should work 
         bool skip_this_file = true;
 
         if (!evaluate_all_files){
             for (size_t i = 0 ; i < arg.filesc ; ++i){
-                if (arg.files[i] == dir_point->d_name){ //Found this file in the list
+                if (strcmp(arg.files[i], dir_point->d_name) == 0){ //Found this file in the list
                     skip_this_file = false;
                     break;
                 }
             }
             if (skip_this_file) {
-                printf("\tIgnored\n");
+                //printf("\tIgnored\n");
                 continue;
             }
         }
+
+        printf("%s\n", new_path);
+
 
         // if dir
         if (simpledu_dir(dir_point->d_name)) {
@@ -165,7 +170,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
     //After iterating over directory, will try to display results
     if (arg.max_depth >= 0){
-        printf("%lld\t%s\n", result,  path);
+        printf("%lld\t%s\n", result + simpledu_stat(path, arg.block_size),  path);
     }
     
     closedir(dir_to_iter);
