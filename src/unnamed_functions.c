@@ -9,7 +9,8 @@
 #include <limits.h>
 #include <unistd.h>
 
-
+static const char *BACK_DIRECTORY = "..";
+static const char *CURRENT_DIRECTORY = ".";
 
 int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
@@ -42,9 +43,13 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
     // Iterating over the items of a directory
     while ( (dir_point = readdir(dir_to_iter)) != NULL) {
-
         char new_path[PATH_MAX];
         sprintf(new_path, "%s/%s", path, dir_point->d_name);
+
+        //Dont know if this is needed, just in case
+        if (strcmp(dir_point->d_name, BACK_DIRECTORY) == 0) continue;
+
+        printf("File is %s ; Path:%s\n", dir_point->d_name, new_path);
 
         //Shitty solution but should work 
         bool skip_this_file = true;
@@ -60,7 +65,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
         }
 
         // if dir
-        if (simpledu_dir(dir_point->d_name)) {
+        if (simpledu_dir(dir_point->d_name) && strcmp(dir_point->d_name, CURRENT_DIRECTORY) != 0) {
             
             //Must deal with dir_to_iter being open before doing fork (dont know how yet)
 
@@ -74,7 +79,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
                 //Display results from children here
 
             } else if (pid == 0) { //child
-
+                printf("Entered child %d\n", getpid());
                 char **new_argv = NULL;
                 simpledu_args_t new_arg = arg;
 
@@ -93,7 +98,9 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
                 //Making envp for new process
                 char pwd[PATH_MAX];
+                char pth[PATH_MAX];
                 sprintf(pwd, "PWD=%s", new_path);
+                sprintf(pth, "PATH=%s", getenv("PATH"));
                 char *envList[] = {pwd, NULL}; 
 
                 //Path to subdirectory
@@ -103,7 +110,10 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
                 if (new_arg.max_depth >= 0) --new_arg.max_depth;
 
                 if (simpledu_args_toargv(&new_arg, &new_argv)) return EXIT_FAILURE;
-                if (execve(new_path, new_argv, envList)) return EXIT_FAILURE;
+                if (execve(new_path, new_argv, envList)) {
+                    printf("execve failed niggaa\n");
+                    return EXIT_FAILURE;
+                }
 
             } else {
                 return EXIT_FAILURE;
