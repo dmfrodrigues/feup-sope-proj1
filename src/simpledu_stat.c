@@ -5,7 +5,8 @@
 off_t simpledu_stat(const char *path, off_t blocksize){
     struct stat buf;
     if(stat(path, &buf)) return -1;
-    return buf.st_size/blocksize;
+    if (buf.st_size % blocksize != 0) return buf.st_size/blocksize + 1;
+    else return buf.st_size/blocksize;
 }
 
 

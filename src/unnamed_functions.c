@@ -44,7 +44,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
     // Iterating over the items of a directory
     while ( (dir_point = readdir(dir_to_iter)) != NULL) {
         char new_path[PATH_MAX];
-        //sprintf(new_path, "%s/%s", path, dir_point->d_name);
+        sprintf(new_path, "%s/%s", path, dir_point->d_name);
 
         //Dont know if this is needed, just in case
         if (strcmp(dir_point->d_name, BACK_DIRECTORY) == 0 || strcmp(dir_point->d_name, CURRENT_DIRECTORY) == 0) continue;
@@ -61,7 +61,10 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
                     break;
                 }
             }
-            if (skip_this_file) break;
+            if (skip_this_file) {
+                printf("\tIgnored\n");
+                continue;
+            }
         }
 
         // if dir
