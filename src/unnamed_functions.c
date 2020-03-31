@@ -66,27 +66,58 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
                     if (simpledu_args_toargv(&new_arg, &new_argv)) return EXIT_FAILURE;
                     if (execve(simpledu_path, new_argv, envp)) return EXIT_FAILURE;
                 }
-            } /*else if (simpledu_symb_link(new_path)) {
+            }
+            
+
+            // I think it's working as intended.
+
+            // If you can test it more throughly please do.
+            // To create a symbolic link type the following on the terminal:
+            /*
+                ln -s [symbolic link target] [symbolic link name]
+
+                for example:
+                    ln -s ./testing_folder1/file1.txt ./i_am_a_symbolic_link
+
+            */
+            else if (simpledu_symb_link(new_path)) {
                 if (arg.dereference) {
-                    // to dereference
-                    // placeholder code
+                    
                     char symb_link_buf[PATH_MAX];
-                    ssize_t len = readlink(dir_point->d_name, symb_link_buf,
-                                           sizeof(symb_link_buf) - 1);
+                    ssize_t len = readlink(dir_point->d_name, symb_link_buf, sizeof(symb_link_buf) - 1);
 
                     // if no error occured
                     if (len != -1) symb_link_buf[len] = '\0';
 
-                    // symb_link_buf -> Path of symb link
-
-                    // display it
+                    // symb_link_buf -> Path of symb link relative to the directory.
+                    // Examples:
+                    //      ../testing_2/testing_symb_link_2_pls_work.txt
+                    //      ./testtt/to_symb_link.txt
+                    
+                    off_t symb_link_file_size = simpledu_stat(symb_link_buf, arg.apparent_size, arg.block_size);
+                    if(symb_link_file_size == -1) return EXIT_FAILURE;
+                    
+                    result += symb_link_file_size;
+                    //If it needs to display file size
+                    if (arg.max_depth >= 0 && arg.all){
+                        printf("%lld\t%s\n", (long long) symb_link_file_size, symb_link_buf);
+                    }
                 }
 
-                else {
-                    // as if it was a regular file (copy from the corresponding
-                    // if when that is complete)
+                else { // -L was not passed as argument. Process as if it was a regular file.
+
+                    // display size and relative path/(name)
+
+                    off_t file_size = simpledu_stat(new_path, arg.apparent_size, arg.block_size);
+                    if(file_size == -1) return EXIT_FAILURE;
+                    result += file_size;
+                    //If it needs to display file size
+                    if (arg.max_depth >= 0 && arg.all){
+                        printf("%lld\t%s\n", (long long) file_size,  new_path);
+                    }
                 }
-            }*/
+            }
+
             else if (simpledu_reg_file(new_path)) { //printf("  IS A REG FILE\n");
 
                 // display size and relative path/(name)
@@ -103,7 +134,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
         // After iterating over directory, will try to display results
         //if (arg.max_depth >= 0) {
-        printf("%ld\t%s\n", result + simpledu_stat(path, arg.apparent_size, arg.block_size), path);
+        printf("%lld\t%s\n", result + simpledu_stat(path, arg.apparent_size, arg.block_size), path);
         //}
 
         closedir(dir_to_iter);
