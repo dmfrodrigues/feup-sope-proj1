@@ -7,7 +7,9 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <limits.h>
+#define __USE_GNU
 #include <unistd.h>
+#include <errno.h>
 
 static const char BACK_DIRECTORY[] = "..";
 static const char CURRENT_DIRECTORY[] = ".";
@@ -51,7 +53,8 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
         sprintf(new_path, "%s/%s", path, dir_point->d_name);
 
         //Dont know if this is needed, just in case
-        if (strcmp(dir_point->d_name, BACK_DIRECTORY) == 0 || strcmp(dir_point->d_name, CURRENT_DIRECTORY) == 0) continue;
+        if (strcmp(dir_point->d_name, BACK_DIRECTORY) == 0 || 
+            strcmp(dir_point->d_name, CURRENT_DIRECTORY) == 0) continue;
 
         //Shitty solution but should work 
         bool skip_this_file = true;
@@ -69,25 +72,24 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
             }
         }
 
-        printf("%s\n", new_path);
+        //printf("%s\n", new_path);
 
 
         // if dir
         if (simpledu_dir(dir_point->d_name)) {
             
-            //Must deal with dir_to_iter being open before doing fork (dont know how yet)
-
             int pid = fork();
             int status;
 
             if (pid > 0) { //parent
                 //Will receive results from pipe here
                 waitpid(pid, &status, 0);
+                printf("Child %d died\n", pid);
 
                 //Display results from children here
 
             } else if (pid == 0) { //child
-                printf("Entered child %d\n", getpid());
+                printf("Entered child %d at %s\n", getpid(), new_path);
                 char **new_argv = NULL;
                 simpledu_args_t new_arg = arg;
 
@@ -106,20 +108,19 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
                 //Making envp for new process
                 char pwd[PATH_MAX];
-                char pth[PATH_MAX];
                 sprintf(pwd, "PWD=%s", new_path);
-                sprintf(pth, "PATH=%s", getenv("PATH"));
                 char *envList[] = {pwd, NULL}; 
 
                 //Path to subdirectory
-                strcat(new_path, "/simpledu");
+                //strcat(new_path, "/simpledu");
 
                 //Updating max_depth
                 if (new_arg.max_depth >= 0) --new_arg.max_depth;
 
                 if (simpledu_args_toargv(&new_arg, &new_argv)) return EXIT_FAILURE;
-                if (execve(new_path, new_argv, envList)) {
-                    printf("execve failed niggaa\n");
+                chdir(new_path);
+                if (execve("/home/rafael/Documents/GitHub/feup-sope-proj1/simpledu", new_argv, envList)) {
+                    perror("Exec failed :");
                     return EXIT_FAILURE;
                 }
 
@@ -153,13 +154,12 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
         }
 
         // if regular file
-        // TODO dont think the size or the formatting correspond to those of the du command...
-        // still don't know how to fix it -_-
+ 
         else if (simpledu_reg_file(dir_point->d_name)) {
             // display size and relative path/(name)
             // Placeholder code. Make it display full relative path from "starting" directory
             off_t file_size = simpledu_stat(dir_point->d_name, arg.block_size);
-
+            result += file_size;
             //If it needs to display file size
             if (arg.max_depth >= 0 && arg.all){
                 printf("%lld\t%s\n", (long long) file_size,  dir_point->d_name);
