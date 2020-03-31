@@ -3,11 +3,16 @@
 
 #include <stdlib.h>
 
-off_t simpledu_stat(const char *path, bool bytes, off_t blocksize){
-    struct stat buf;
-    if(stat(path, &buf)) return -1;
+#include <stdio.h>
 
-    if (bytes) return buf.st_size;
+off_t simpledu_stat(const char *path, bool apparent_size, off_t blocksize){
+    struct stat buf;
+    if(stat(path, &buf))
+        return -1;
+    printf("path: %s\n", path);
+    printf("st_size: %ld\nst_blksize: %ld\nst_blocks: %ld\n", buf.st_size, buf.st_blksize, buf.st_blocks);
+
+    if (apparent_size) return buf.st_size/blocksize;
 
     int result = buf.st_blocks * 512;
     if (result % blocksize != 0) return (result / blocksize) + 1;

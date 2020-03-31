@@ -179,6 +179,7 @@ int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv){
     int i = 0;
     {                     strcpy(buf, "./simpledu"     ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //Program name
     if(p->all          ){ strcpy(buf, "-a"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-a, --all
+    if(p->apparent_size){ strcpy(buf, "--apparent-size"); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-a, --all
     { sprintf(buf, "--blocksize=%llu"  , p->block_size ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-B, --blocksize
     if(p->count_links  ){ strcpy(buf, "-l"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-l, --count-links
     if(p->dereference  ){ strcpy(buf, "-L"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-L, --dereference

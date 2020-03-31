@@ -69,7 +69,7 @@ int simpledu_log_CREATE(int argc, const char* const argv[]){
     if(filedes == -1) return EXIT_SUCCESS;
     double t; if(simpledu_gettime(&t)) return EXIT_FAILURE; 
     char buff[MAXN]; if(sprintf(buff, "%.2f %08d CREATE ", t, getpid()) < 0) return EXIT_FAILURE;
-    for(int i = 0; i < argc; ++i) strcat(buff, argv[i]);
+    for(int i = 0; i < argc; ++i) strcat(strcat(buff, argv[i]), " ");
     strcat(buff, "\n");
     if(simpledu_log_write(buff, strlen(buff)) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
