@@ -22,12 +22,14 @@ static const simpledu_args_t simpledu_args_default =
 };
 
 static const char optstring[] = "abLlSB:d:f:p:";
+static int apparent_size = false;
 static const struct option longopts[] = {
     {"all"          , 0, NULL, 'a'},
     {"bytes"        , 0, NULL, 'b'},
     {"dereference"  , 0, NULL, 'L'},
     {"count-links"  , 0, NULL, 'l'},
     {"separate-dirs", 0, NULL, 'S'},
+    {"apparent-size", 1, &apparent_size, 1},
     {"blocksize"    , 1, NULL, 'B'},
     {"max-depth"    , 1, NULL, 'd'},
     {"log-filedes"  , 1, NULL, 'f'},
@@ -54,6 +56,12 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
             case 'd': if(sscanf(optarg, "%hu" , &p->max_depth   ) != 1) return EXIT_FAILURE; break;
             case 'f': if(sscanf(optarg, "%d"  , &p->log_filedes ) != 1) return EXIT_FAILURE; break;
             case 'p': if(sscanf(optarg, "%d"  , &p->pipe_filedes) != 1) return EXIT_FAILURE; break;
+            case 0:
+                if(apparent_size){
+                    p->apparent_size = true;
+                    apparent_size = false;
+                }
+                break;
             default: opterr = 1; optind = 1; return EXIT_FAILURE;
         }
     }
