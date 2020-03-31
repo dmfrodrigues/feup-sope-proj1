@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <stdarg.h>
 
 /**
  * @brief Holds all argument options with which 'simpledu' was called.
@@ -95,6 +96,8 @@ int simpledu_args_dtor(simpledu_args_t *p);
  * @return false    Otherwise
  */
 bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2);
+
+int simpledu_args_set_files(simpledu_args_t *p, int num,...);
 
 int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv);
 

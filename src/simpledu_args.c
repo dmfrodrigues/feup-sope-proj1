@@ -118,6 +118,45 @@ bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2){
     return true;
 }
 
+int simpledu_args_copy(simpledu_args_t *p1, const simpledu_args_t *p2){
+    p1->all             = p2->all;
+    p1->apparent_size   = p2->apparent_size;
+    p1->block_size      = p2->block_size;
+    p1->count_links     = p2->count_links;
+    p1->dereference     = p2->dereference;
+    p1->separate_dirs   = p2->separate_dirs;
+    p1->max_depth       = p2->max_depth;
+    p1->log_filedes     = p2->log_filedes;
+    p1->pipe_filedes    = p2->pipe_filedes;
+    p1->filesc          = p2->filesc;
+    p1->files = malloc(p1->filesc*sizeof(char*));
+    for(size_t i = 0; i < p1->filesc; ++i){
+        p1->files[i] = malloc((strlen(p2->files[i])+1)*sizeof(char));
+        if(p1->files[i] == NULL) return EXIT_FAILURE;
+        strcpy(p1->files[i], p2->files[i]);
+    }
+    return EXIT_SUCCESS;
+}
+
+int simpledu_args_set_files(simpledu_args_t *p, int num,...){
+    va_list valist;
+    va_start(valist, num);
+    for(size_t i = 0; i < p->filesc; ++i){
+        free(p->files[i]);
+        p->files[i] = NULL;
+    }
+    free(p->files); p->files = NULL;
+    p->filesc = num;
+    p->files = malloc(p->filesc*sizeof(char*));
+    for(size_t i = 0; i < p->filesc; ++i){
+        char *s = va_arg(valist, char*);
+        p->files[i] = malloc((strlen(s)+1)*sizeof(char));
+        if(p->files[i] == NULL) return EXIT_FAILURE;
+        strcpy(p->files[i], s);
+    }
+    return EXIT_SUCCESS;
+}
+
 #define TOARGV_MIN_ARGC 8
 #define TOARGV_BUF_SIZE 4096
 
