@@ -30,6 +30,9 @@ int main(int argc, char *argv[], char *envp[]){
     if(simpledu_init(argc, argv, envp)) simpledu_exit(EXIT_FAILURE);
     if(atexit(simpledu_clean)) simpledu_exit(EXIT_FAILURE);
 
+    if (simpledu_set_exec_path(envp)) simpledu_exit(EXIT_FAILURE);
+
+
     if(arg.log_filedes != FILEDES_INVALID){
         //A parent process provided a log filedes
         //Case 2

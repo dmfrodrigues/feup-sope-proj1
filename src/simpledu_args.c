@@ -7,7 +7,8 @@
 #include <getopt.h>
 
 static const simpledu_args_t simpledu_args_default = 
-{ .all = false, 
+{ 
+.all = false, 
 .bytes = false, 
 .dereference = false, 
 .count_links = false, 

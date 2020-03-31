@@ -109,7 +109,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
                 //Making envp for new process
                 char pwd[PATH_MAX];
                 sprintf(pwd, "PWD=%s", new_path);
-                char *envList[] = {pwd, NULL}; 
+                char *envList[] = {pwd, getenv("EXEC_PATH"), NULL}; 
 
                 //Path to subdirectory
                 //strcat(new_path, "/simpledu");
@@ -119,7 +119,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
                 if (simpledu_args_toargv(&new_arg, &new_argv)) return EXIT_FAILURE;
                 chdir(new_path);
-                if (execve("/home/rafael/Documents/GitHub/feup-sope-proj1/simpledu", new_argv, envList)) {
+                if (execve(getenv("EXEC_PATH"), new_argv, envList)) {
                     perror("Exec failed :");
                     return EXIT_FAILURE;
                 }
