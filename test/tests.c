@@ -66,42 +66,86 @@ void test_simpledu_args_ctor3(void){
 }
 
 void test_simpledu_args_equal(void){
-    {
-        int argc = 8;
-        const char *argv_const[9] = {"prog", "-a",  "-l",  "-S", "-B",
-                                     "300",  "./a", "./b", NULL};
-        char *argv[9];
-        argv[argc] = NULL;
-        for (int i = 0; i < argc; ++i) {
-            argv[i] = malloc((strlen(argv_const[i]) + 1)*sizeof(char));
-            strcpy(argv[i], argv_const[i]);
-        }
-        simpledu_args_t a1;
-        TEST_CHECK(simpledu_args_ctor(&a1, argc, argv) == EXIT_SUCCESS);
-        simpledu_args_t a2;
-        TEST_CHECK(simpledu_args_ctor(&a2, argc, argv) == EXIT_SUCCESS);
-        TEST_CHECK(simpledu_args_equal(&a1, &a2));
-        const char *argv2_const[9] = {"prog", "-a",  "-l",  "-S", "-B",
-                                      "299",  "./a", "./b", NULL};
-        char *argv2[9];
-        argv2[argc] = NULL;
-        for (int i = 0; i < argc; ++i) {
-            argv2[i] = malloc((strlen(argv2_const[i]) + 1)*sizeof(char));
-            strcpy(argv2[i], argv2_const[i]);
-        }
-        TEST_CHECK(simpledu_args_ctor(&a2, argc, argv2) == EXIT_SUCCESS);
-        TEST_CHECK(!simpledu_args_equal(&a1, &a2));
-        for (int i = 0; i < argc; ++i) free(argv[i]);
-        for (int i = 0; i < argc; ++i) free(argv2[i]);
-        TEST_CHECK(simpledu_args_dtor(&a1) == EXIT_SUCCESS);
-        TEST_CHECK(simpledu_args_dtor(&a2) == EXIT_SUCCESS);
+    int argc = 8;
+    const char *argv_const[9] = {"prog", "-a",  "-l",  "-S", "-B",
+                                    "300",  "./a", "./b", NULL};
+    char *argv[9];
+    argv[argc] = NULL;
+    for (int i = 0; i < argc; ++i) {
+        argv[i] = malloc((strlen(argv_const[i]) + 1)*sizeof(char));
+        strcpy(argv[i], argv_const[i]);
     }
+    simpledu_args_t a1;
+    TEST_CHECK(simpledu_args_ctor(&a1, argc, argv) == EXIT_SUCCESS);
+    simpledu_args_t a2;
+    TEST_CHECK(simpledu_args_ctor(&a2, argc, argv) == EXIT_SUCCESS);
+    TEST_CHECK(simpledu_args_equal(&a1, &a2));
+    const char *argv2_const[9] = {"prog", "-a",  "-l",  "-S", "-B",
+                                    "299",  "./a", "./b", NULL};
+    char *argv2[9];
+    argv2[argc] = NULL;
+    for (int i = 0; i < argc; ++i) {
+        argv2[i] = malloc((strlen(argv2_const[i]) + 1)*sizeof(char));
+        strcpy(argv2[i], argv2_const[i]);
+    }
+    TEST_CHECK(simpledu_args_ctor(&a2, argc, argv2) == EXIT_SUCCESS);
+    TEST_CHECK(!simpledu_args_equal(&a1, &a2));
+    for (int i = 0; i < argc; ++i) free(argv[i]);
+    for (int i = 0; i < argc; ++i) free(argv2[i]);
+    TEST_CHECK(simpledu_args_dtor(&a1) == EXIT_SUCCESS);
+    TEST_CHECK(simpledu_args_dtor(&a2) == EXIT_SUCCESS);
+}
+
+void test_simpledu_args_copy(void){
+    int argc = 8;
+    const char *argv_const[9] = {"prog", "-a",  "-l",  "-S", "-B",
+                                    "300",  "./a", "./b", NULL};
+    char *argv[9];
+    argv[argc] = NULL;
+    for (int i = 0; i < argc; ++i) {
+        argv[i] = malloc((strlen(argv_const[i]) + 1)*sizeof(char));
+        strcpy(argv[i], argv_const[i]);
+    }
+    simpledu_args_t a1;
+    TEST_CHECK(simpledu_args_ctor(&a1, argc, argv) == EXIT_SUCCESS);
+    simpledu_args_t a2;
+    TEST_CHECK(simpledu_args_ctor(&a2, 0, NULL) == EXIT_SUCCESS);
+    TEST_CHECK(!simpledu_args_equal(&a1, &a2));
+    TEST_CHECK(simpledu_args_copy(&a2, &a1) == EXIT_SUCCESS);
+    TEST_CHECK(simpledu_args_equal(&a1, &a2));
+
+    TEST_CHECK(simpledu_args_dtor(&a1) == EXIT_SUCCESS);
+    TEST_CHECK(simpledu_args_dtor(&a2) == EXIT_SUCCESS);
+}
+
+void test_simpledu_args_set_files(void){
+    int argc = 8;
+    const char *argv_const[9] = {"prog", "-a",  "-l",  "-S", "-B",
+                                    "300",  "./a", "./b", NULL};
+    char *argv[9];
+    argv[argc] = NULL;
+    for (int i = 0; i < argc; ++i) {
+        argv[i] = malloc((strlen(argv_const[i]) + 1)*sizeof(char));
+        strcpy(argv[i], argv_const[i]);
+    }
+    simpledu_args_t arg;
+    TEST_CHECK(simpledu_args_ctor(&arg, argc, argv) == EXIT_SUCCESS);
+
+    TEST_CHECK(simpledu_args_set_files(&arg, 3, "./c", "./d", "./e") == EXIT_SUCCESS);
+    TEST_CHECK(arg.filesc == 3);
+    TEST_CHECK(strcmp(arg.files[0], "./c") == 0);
+    TEST_CHECK(strcmp(arg.files[1], "./d") == 0);
+    TEST_CHECK(strcmp(arg.files[2], "./e") == 0);   
+
+    TEST_CHECK(simpledu_args_dtor(&arg) == EXIT_SUCCESS);
 }
 
 TEST_LIST = {
-    {"simpledu_args_ctor1", test_simpledu_args_ctor1},
-    {"simpledu_args_ctor2", test_simpledu_args_ctor2},
-    {"simpledu_args_ctor3", test_simpledu_args_ctor3},
-    {"simpledu_args_equal", test_simpledu_args_equal},
+    {"simpledu_args_ctor1"      , test_simpledu_args_ctor1      },
+    {"simpledu_args_ctor2"      , test_simpledu_args_ctor2      },
+    {"simpledu_args_ctor3"      , test_simpledu_args_ctor3      },
+    {"simpledu_args_equal"      , test_simpledu_args_equal      },
+    {"simpledu_args_copy"       , test_simpledu_args_copy       },
+    {"simpledu_args_set_files"  , test_simpledu_args_set_files  },
     {NULL, NULL}
 };

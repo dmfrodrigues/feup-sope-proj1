@@ -39,6 +39,8 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
     if(p == NULL){ errno = EINVAL; return EXIT_FAILURE; }
     *p = simpledu_args_default;
 
+    if(argc == 0 || argv == NULL) return EXIT_SUCCESS;
+
     opterr = 0; optind = 1;
     int opt = 0; int longindex;
     while((opt = getopt_long(argc, argv, optstring, longopts, &longindex)) != -1){

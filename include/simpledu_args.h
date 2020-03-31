@@ -98,8 +98,34 @@ int simpledu_args_dtor(simpledu_args_t *p);
  */
 bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2);
 
+/**
+ * @brief Deep copy contents from a simpledu_args to another.
+ * 
+ * @param p1        Destination
+ * @param p2        Source
+ * @return int      EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
+ */
+int simpledu_args_copy(simpledu_args_t *p1, const simpledu_args_t *p2);
+
+/**
+ * @brief Set list of files.
+ * 
+ * This function has a variable number of arguments.
+ * 
+ * @param p     simpledu_args to change
+ * @param num   Number of arguments after this one
+ * @param ...   List of char pointers
+ * @return int  EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
+ */
 int simpledu_args_set_files(simpledu_args_t *p, int num,...);
 
+/**
+ * @brief Convert simpledu_args to a representation equivalent to an argv.
+ * 
+ * @param p     Source
+ * @param pargv Pointer to future argv
+ * @return int  EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
+ */
 int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv);
 
 #endif //SIMPLEDU_ARGS_H_INCLUDED
