@@ -15,10 +15,14 @@ typedef struct {
      */
     bool all;
     /**
+     * --apparent-size
+     * print apparent sizes, rather than disk usage; 
+     */
+    bool apparent_size;
+    /**
      * -b, --bytes
      *  write real size in bytes
      */
-    bool bytes;
     /**
      * -B, --block-size=SIZE
      * scale sizes by SIZE before printing them; defaults to 1024
