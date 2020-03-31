@@ -1,10 +1,14 @@
 #include "simpledu_stat.h"
+#include "simpledu_args.h"
 
 #include <stdlib.h>
 
-off_t simpledu_stat(const char *path, off_t blocksize){
+off_t simpledu_stat(const char *path, bool bytes, off_t blocksize){
     struct stat buf;
     if(stat(path, &buf)) return -1;
+
+    if (bytes) return buf.st_size;
+
     int result = buf.st_blocks * 512;
     if (result % blocksize != 0) return (result / blocksize) + 1;
     else return result / blocksize;

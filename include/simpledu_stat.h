@@ -13,7 +13,7 @@
  * @param blocksize Block size in bytes
  * @return off_t    Number of blocks if successful, -1 if failed
  */
-off_t simpledu_stat(const char *path, off_t blocksize);
+off_t simpledu_stat(const char *path, bool bytes,off_t blocksize);
 
 
 /**
