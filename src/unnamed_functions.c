@@ -134,7 +134,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
         // After iterating over directory, will try to display results
         //if (arg.max_depth >= 0) {
-        printf("%lld\t%s\n", result + simpledu_stat(path, arg.apparent_size, arg.block_size), path);
+        printf("%ld\t%s\n", result + simpledu_stat(path, arg.apparent_size, arg.block_size), path);
         //}
 
         closedir(dir_to_iter);
