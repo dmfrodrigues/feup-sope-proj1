@@ -16,10 +16,11 @@ typedef struct {
     bool all;
     /**
      * -b, --bytes
-     *  equivalent to '--block-size=1'; write real size in bytes
+     *  write real size in bytes
      */
+    bool bytes;
     /**
-     * -B, --blocksize=SIZE
+     * -B, --block-size=SIZE
      * scale sizes by SIZE before printing them; defaults to 1024
      */
     long long unsigned block_size;

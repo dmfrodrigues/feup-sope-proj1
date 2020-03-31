@@ -6,7 +6,18 @@
 #include <unistd.h>
 #include <getopt.h>
 
-static const simpledu_args_t simpledu_args_default = {false, 1024, false, false, false, PATH_MAX/4, -1, -1, 0, NULL};
+static const simpledu_args_t simpledu_args_default = 
+{ .all = false, 
+.bytes = false, 
+.dereference = false, 
+.count_links = false, 
+.separate_dirs = false, 
+.max_depth = PATH_MAX/4, 
+.log_filedes = -1, 
+.pipe_filedes = -1, 
+.filesc = 0, 
+.files = NULL
+};
 
 static const char optstring[] = "abLlSB:d:f:p:";
 static const struct option longopts[] = {
@@ -31,7 +42,7 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
     while((opt = getopt_long(argc, argv, optstring, longopts, &longindex)) != -1){
         switch(opt){
             case 'a': p->all           = true; break;
-            case 'b': p->block_size    =    1; break;
+            case 'b': p->bytes         = true; break;
             case 'L': p->dereference   = true; break;
             case 'l': p->count_links   = true; break;
             case 'S': p->separate_dirs = true; break;
@@ -92,6 +103,7 @@ bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2){
     if(p1 == NULL || p2 == NULL) return false;
     if(!(
         p1->all             == p2->all              &&
+        p1->bytes           == p2->bytes            &&
         p1->block_size      == p2->block_size       &&
         p1->count_links     == p2->count_links      &&
         p1->dereference     == p2->dereference      &&
@@ -117,6 +129,7 @@ int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv){
     int i = 0;
     {                     strcpy(buf, "./simpledu"     ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //Program name
     if(p->all          ){ strcpy(buf, "-a"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-a, --all
+    if(p->bytes        ){ strcpy(buf, "-b"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-b, --bytes
     { sprintf(buf, "--blocksize=%llu"  , p->block_size ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-B, --blocksize
     if(p->count_links  ){ strcpy(buf, "-l"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-l, --count-links
     if(p->dereference  ){ strcpy(buf, "-L"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-L, --dereference

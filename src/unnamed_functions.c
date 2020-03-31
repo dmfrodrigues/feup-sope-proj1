@@ -38,7 +38,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
         return EXIT_FAILURE;
     }
 
-
+    //Dealing with files given in args
     if (arg.filesc > 1){ //Will only evaluate the given files
         //printf("\n\nGIVEN MORE THAN ONE FILE\n\n");
         evaluate_all_files = false;
@@ -84,12 +84,12 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
             if (pid > 0) { //parent
                 //Will receive results from pipe here
                 waitpid(pid, &status, 0);
-                printf("Child %d died\n", pid);
+                //printf("Child %d died\n", pid);
 
                 //Display results from children here
 
             } else if (pid == 0) { //child
-                printf("Entered child %d at %s\n", getpid(), new_path);
+                //printf("Entered child %d at %s\n", getpid(), new_path);
                 char **new_argv = NULL;
                 simpledu_args_t new_arg = arg;
 
