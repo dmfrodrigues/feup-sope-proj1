@@ -1,3 +1,3 @@
-LOG_FILENAME=out.log
+LOG_FILENAME=~/Documents/out.log
 export LOG_FILENAME
-./simpledu -a ./include
+./simpledu -a -S

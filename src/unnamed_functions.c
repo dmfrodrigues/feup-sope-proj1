@@ -17,8 +17,7 @@ static const char THIS_DIR[] = ".";
 
 int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
     // Get path
-    char simpledu_path[PATH_MAX];
-    {
+    char simpledu_path[PATH_MAX];{
         if (getcwd(simpledu_path, PATH_MAX) == NULL)
             simpledu_exit(EXIT_FAILURE);
         strcat(simpledu_path, "/simpledu");
@@ -97,7 +96,7 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
                 result += file_size;
                 //If it needs to display file size
                 if (arg.max_depth >= 0 && arg.all){
-                    printf("%lld\t%s\n", (long long) file_size,  dir_point->d_name);
+                    printf("%lld\t%s\n", (long long) file_size,  new_path);
                 }
             }
         }
