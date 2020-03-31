@@ -44,11 +44,11 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
     while((opt = getopt_long(argc, argv, optstring, longopts, &longindex)) != -1){
         switch(opt){
             case 'a': p->all           = true; break;
-            case 'b': p->block_size    =    1; break;
+            case 'b': p->block_size    =    1; p->apparent_size = true; break;
             case 'L': p->dereference   = true; break;
             case 'l': p->count_links   = true; break;
             case 'S': p->separate_dirs = true; break;
-            case 'B': if(sscanf(optarg, "%llu", &p->block_size  ) != 1) return EXIT_FAILURE; p->apparent_size = true; break;
+            case 'B': if(sscanf(optarg, "%llu", &p->block_size  ) != 1) return EXIT_FAILURE; break;
             case 'd': if(sscanf(optarg, "%hu" , &p->max_depth   ) != 1) return EXIT_FAILURE; break;
             case 'f': if(sscanf(optarg, "%d"  , &p->log_filedes ) != 1) return EXIT_FAILURE; break;
             case 'p': if(sscanf(optarg, "%d"  , &p->pipe_filedes) != 1) return EXIT_FAILURE; break;

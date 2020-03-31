@@ -17,7 +17,8 @@ typedef struct {
     bool all;
     /**
      * --apparent-size
-     * print apparent sizes, rather than disk usage; 
+     * print apparent sizes, rather than disk usage;
+     * This option is not available for shell use, given it is only supposed to be activated by -b
      */
     bool apparent_size;
     /**
