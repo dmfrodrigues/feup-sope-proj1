@@ -5,16 +5,13 @@
 
 #include <stdio.h>
 
+static const off_t stat_std_block_size = 512;
+
 off_t simpledu_stat(const char *path, bool apparent_size, off_t blocksize){
     struct stat buf;
-    if(stat(path, &buf))
-        return -1;
-
-    if (apparent_size) return buf.st_size/blocksize;
-
-    int result = buf.st_blocks * 512;
-    if (result % blocksize != 0) return (result / blocksize) + 1;
-    else return result / blocksize;
+    if(stat(path, &buf)) return -1;
+    off_t result = (apparent_size ? buf.st_size : buf.st_blocks*stat_std_block_size);
+    return result/blocksize + (result%blocksize ? 1 : 0);
 }
 
 
