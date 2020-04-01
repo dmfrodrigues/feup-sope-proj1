@@ -23,6 +23,7 @@ test: all
 	$(CC) $(CFLAGS) -c -I./acutest/include $(TDIR)/tests.c -o $(ODIR)/tests.o
 	$(CC) $(ODIR)/tests.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_envp.o $(ODIR)/simpledu_stat.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o $(ODIR)/unnamed_functions.o -o $(ODIR)/$(TEXE)
 	$(ODIR)/$(TEXE)
+	chmod u+x $(TDIR)/test_compare_du.sh $(TDIR)/compare_du.sh
 	$(TDIR)/test_compare_du.sh
 
 testmem:

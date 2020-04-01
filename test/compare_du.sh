@@ -1,10 +1,15 @@
-GREEN_INTENSIVE=$(tput bold)$(tput setaf 2)
-RED_INTENSIVE=$(tput bold)$(tput setaf 1)
-NC_INTENSIVE=$(tput bold)
-NC=$(tput sgr0)
+# GREEN_INTENSIVE=$(tput bold)$(tput setaf 2)
+# RED_INTENSIVE=$(tput bold)$(tput setaf 1)
+# NC_INTENSIVE=$(tput bold)
+# NC=$(tput sgr0)
+
+GREEN_INTENSIVE='\033[1;32m'
+RED_INTENSIVE='\033[1;31m'
+NC_INTENSIVE='\033[1m' # No Color
+NC='\033[0m' # No Color
 
 s="${NC_INTENSIVE}Test with args '$1'...${NC}"
-printf %-58s "$s"
+printf %-56b "$s"
 
 (./simpledu $1 || echo $?) | sort -k2 > /tmp/teste_simpledu.txt
 (du         $1 || echo $?) | sort -k2 > /tmp/teste_du.txt
