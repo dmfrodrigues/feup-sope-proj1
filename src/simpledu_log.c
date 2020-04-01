@@ -18,7 +18,7 @@
 static int filedes = NOFILEDES;
 
 int simpledu_log_createlog(const char * filename){
-    filedes = creat(filename, O_APPEND);
+    filedes = creat(filename, S_IRWXU);
     return filedes;
 }
 

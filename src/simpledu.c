@@ -72,14 +72,13 @@ int main(int argc, char *argv[], char *envp[]){
     }
     */
 
-
-
-
     for(size_t i = 0; i < arg.filesc; ++i){
         int pipe_id;
         off_t size, more_size;
 
         if(simpledu_iterate(arg.files[i], arg, envp, &pipe_id, &size)) simpledu_exit(EXIT_FAILURE);
+        if(simpledu_retrieve(arg.pipe_filedes, &more_size));
+        if(simpledu_print(arg.files[i], size, more_size, arg));
     }
 
     simpledu_exit(EXIT_SUCCESS);

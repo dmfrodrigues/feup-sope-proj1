@@ -9,7 +9,7 @@ NC_INTENSIVE='\033[1m' # No Color
 NC='\033[0m' # No Color
 
 s="${NC_INTENSIVE}Test with args '$1'...${NC}"
-printf %-56b "$s"
+printf %-72b "$s"
 
 (./simpledu $1 || echo $?) | sort -k2 > /tmp/teste_simpledu.txt
 (du         $1 || echo $?) | sort -k2 > /tmp/teste_du.txt
