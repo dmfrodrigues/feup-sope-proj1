@@ -9,33 +9,32 @@ static const off_t stat_std_block_size = 512;
 
 off_t simpledu_stat(const char *path, bool apparent_size, off_t blocksize){
     struct stat buf;
-    if(stat(path, &buf)) return -1;
+    if(lstat(path, &buf)) return -1;
     off_t result = (apparent_size ? buf.st_size : buf.st_blocks*stat_std_block_size);
     return result/blocksize + (result%blocksize ? 1 : 0);
 }
 
-
-int simpledu_symb_link(const char *path) {
+bool simpledu_symb_link(const char *path) {
     struct stat buf;
     if(lstat(path, &buf)) return -1;
     return S_ISLNK(buf.st_mode);
 }
 
-int simpledu_dir(const char *path) {
+bool simpledu_dir(const char *path) {
     struct stat buf;
-    if(stat(path, &buf)) return 0;
+    if(lstat(path, &buf)) return 0;
     return S_ISDIR(buf.st_mode);
 }
 
-int simpledu_reg_file(const char *path) {
+bool simpledu_reg_file(const char *path) {
     struct stat buf;
-    if(stat(path, &buf)) return 0;
+    if(lstat(path, &buf)) return 0;
     return S_ISREG(buf.st_mode);
 }
 
 off_t simpledu_file_size(const char *path) {
     struct stat buf;
-    if(stat(path, &buf)) return -1;
+    if(lstat(path, &buf)) return -1;
     return buf.st_size;
 }
 

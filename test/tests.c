@@ -1,6 +1,7 @@
 #include "acutest.h"
 
 #include "simpledu_args.h"
+#include "simpledu_stat.h"
 
 void test_simpledu_args_ctor1(void) {
     int argc = 1;
@@ -140,6 +141,18 @@ void test_simpledu_args_set_files(void){
     TEST_CHECK(simpledu_args_dtor(&arg) == EXIT_SUCCESS);
 }
 
+void test_simpledu_symb_link(void){
+    TEST_CHECK(simpledu_symb_link   ("test"                             ) == false);
+    TEST_CHECK(simpledu_symb_link   ("test/tests.c"                     ) == false);
+    TEST_CHECK(simpledu_symb_link   ("test/test-folder/D1/Db/Dx/symlnk" ) == true );
+}
+
+void test_simpledu_dir(void){
+    TEST_CHECK(simpledu_dir         ("test"                             ) == true );
+    TEST_CHECK(simpledu_dir         ("test/tests.c"                     ) == false);
+    TEST_CHECK(simpledu_dir         ("test/test-folder/D1/Db/Dx/symlnk" ) == false);
+}
+
 TEST_LIST = {
     {"simpledu_args_ctor1"      , test_simpledu_args_ctor1      },
     {"simpledu_args_ctor2"      , test_simpledu_args_ctor2      },
@@ -147,5 +160,7 @@ TEST_LIST = {
     {"simpledu_args_equal"      , test_simpledu_args_equal      },
     {"simpledu_args_copy"       , test_simpledu_args_copy       },
     {"simpledu_args_set_files"  , test_simpledu_args_set_files  },
+    {"simpledu_symb_link"       , test_simpledu_symb_link       },
+    {"simpledu_dir"             , test_simpledu_dir             },
     {NULL, NULL}
 };

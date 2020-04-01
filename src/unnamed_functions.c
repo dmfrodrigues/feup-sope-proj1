@@ -44,9 +44,8 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
             char new_path[PATH_MAX];
             strcat(strcat(strcpy(new_path, path), "/"), dir_point->d_name);
 
-            //printf("EXPLORING %s\n", new_path);
             // if dir
-            if (simpledu_dir(new_path)) { //printf("  IS A DIR\n");
+            if (simpledu_dir(new_path)) {
 
                 int pid = fork();
                 int status;
@@ -69,19 +68,6 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
                     if (execve(simpledu_path, new_argv, envp)) return EXIT_FAILURE;
                 }
             }
-            
-
-            // I think it's working as intended.
-
-            // If you can test it more throughly please do.
-            // To create a symbolic link type the following on the terminal:
-            /*
-                ln -s [symbolic link target] [symbolic link name]
-
-                for example:
-                    ln -s ./testing_folder1/file1.txt ./i_am_a_symbolic_link
-
-            */
             else if (simpledu_symb_link(new_path)) {
                 if (arg.dereference) {
                     
@@ -102,7 +88,7 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
                     result += symb_link_file_size;
                     //If it needs to display file size
                     if (arg.max_depth >= 0 && arg.all){
-                        printf("%lld\t%s\n", (long long) symb_link_file_size, symb_link_buf);
+                        printf("%ld\t%s\n", symb_link_file_size, symb_link_buf);
                     }
                 }
 
@@ -115,7 +101,7 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
                     result += file_size;
                     //If it needs to display file size
                     if (arg.max_depth >= 0 && arg.all){
-                        printf("%lld\t%s\n", (long long) file_size,  new_path);
+                        printf("%ld\t%s\n", file_size,  new_path);
                     }
                 }
             }
