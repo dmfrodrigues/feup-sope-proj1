@@ -15,7 +15,9 @@
 static const char PARENT_DIR[] = "..";
 static const char THIS_DIR[] = ".";
 
-int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
+int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *pipe_id, off_t *size) {
+    //Size
+    *size = 0;
     // Get path
     char simpledu_path[PATH_MAX];{
         if (getcwd(simpledu_path, PATH_MAX) == NULL)
@@ -23,10 +25,10 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
         strcat(simpledu_path, "/simpledu");
     }
     // Iterate
-    for (size_t i = 0; i < arg.filesc; ++i) {
+    //for (size_t i = 0; i < arg.filesc; ++i) {
         off_t result = 0;
             
-        char *path = arg.files[i];
+        //char *path = arg.files[i];
         if (!simpledu_dir(path)) return EXIT_FAILURE;
 
         DIR *dir_to_iter = opendir(path);
@@ -134,11 +136,12 @@ int simpledu_iterate(int *pipe_pid, simpledu_args_t arg, char *envp[]) {
 
         // After iterating over directory, will try to display results
         //if (arg.max_depth >= 0) {
-        printf("%ld\t%s\n", result + simpledu_stat(path, arg.apparent_size, arg.block_size), path);
+            printf("%ld\t%s\n", result + simpledu_stat(path, arg.apparent_size, arg.block_size), path);
         //}
+        *size += result;
 
         closedir(dir_to_iter);
-    }
+    //}
 
     return EXIT_SUCCESS;
 }
