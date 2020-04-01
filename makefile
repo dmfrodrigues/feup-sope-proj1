@@ -23,6 +23,7 @@ test: all
 	$(CC) $(CFLAGS) -c -I./acutest/include $(TDIR)/tests.c -o $(ODIR)/tests.o
 	$(CC) $(ODIR)/tests.o $(ODIR)/simpledu_args.o -o $(ODIR)/$(TEXE)
 	$(ODIR)/$(TEXE)
+	$(TDIR)/test_compare_du.sh
 
 testmem:
 	valgrind --leak-check=yes $(ODIR)/$(TEXE)
