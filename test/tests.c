@@ -165,6 +165,13 @@ void test_simpledu_args_set_files(void){
     TEST_CHECK(simpledu_args_dtor(&arg) == EXIT_SUCCESS);
 }
 
+void test_simpledu_mode(void){
+    simpledu_mode_t m;
+    TEST_CHECK(simpledu_mode("test"                             , &m) == EXIT_SUCCESS); TEST_CHECK(m == simpledu_mode_dir);
+    TEST_CHECK(simpledu_mode("test/tests.c"                     , &m) == EXIT_SUCCESS); TEST_CHECK(m == simpledu_mode_reg);
+    TEST_CHECK(simpledu_mode("test/test-folder/D1/Db/Dx/symlnk" , &m) == EXIT_SUCCESS); TEST_CHECK(m == simpledu_mode_lnk);
+}
+
 void test_simpledu_symb_link(void){
     TEST_CHECK(simpledu_symb_link   ("test"                             ) == false);
     TEST_CHECK(simpledu_symb_link   ("test/tests.c"                     ) == false);
@@ -185,6 +192,7 @@ TEST_LIST = {
     {"simpledu_args_equal"      , test_simpledu_args_equal      },
     {"simpledu_args_copy"       , test_simpledu_args_copy       },
     {"simpledu_args_set_files"  , test_simpledu_args_set_files  },
+    {"simpledu_mode"            , test_simpledu_mode            },
     {"simpledu_symb_link"       , test_simpledu_symb_link       },
     {"simpledu_dir"             , test_simpledu_dir             },
     {NULL, NULL}

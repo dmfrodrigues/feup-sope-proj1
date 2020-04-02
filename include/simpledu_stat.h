@@ -15,6 +15,24 @@
  */
 off_t simpledu_stat(const char *path, bool bytes,off_t blocksize);
 
+/**
+ * @brief Mode of a file
+ */
+typedef enum {
+    simpledu_mode_reg,
+    simpledu_mode_dir,
+    simpledu_mode_lnk,
+    simpledu_mode_non
+} simpledu_mode_t;
+
+/**
+ * @brief Get type/mode of file in path
+ * 
+ * @param path  Path of file
+ * @param m     To store mode
+ * @return int  EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
+ */
+int simpledu_mode(const char *path, simpledu_mode_t *m);
 
 /**
  * @brief Check if a file is a symbolic link or not.

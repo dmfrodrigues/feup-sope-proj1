@@ -14,6 +14,16 @@ off_t simpledu_stat(const char *path, bool apparent_size, off_t blocksize){
     return result/blocksize + (result%blocksize ? 1 : 0);
 }
 
+int simpledu_mode(const char *path, simpledu_mode_t *m){
+    struct stat buf;
+    if(lstat(path, &buf)) return EXIT_FAILURE;
+    if     (S_ISREG(buf.st_mode)) *m = simpledu_mode_reg;
+    else if(S_ISDIR(buf.st_mode)) *m = simpledu_mode_dir;
+    else if(S_ISLNK(buf.st_mode)) *m = simpledu_mode_lnk;
+    else                          *m = simpledu_mode_non;
+    return EXIT_SUCCESS;
+}
+
 bool simpledu_symb_link(const char *path) {
     struct stat buf;
     if(lstat(path, &buf)) return -1;
