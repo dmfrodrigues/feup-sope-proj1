@@ -41,8 +41,13 @@ test/compare_du.sh "-l -S -B 10 include"
 test/compare_du.sh "-l -S -B 10 acutest"
 
 # Testes com vários
+test/compare_du.sh "-l -S -B 10 acutest include test"
 
-test/compare_du.sh "-l -S -B 10 acutest include"
+# Testes com barra final
+test/compare_du.sh "-l -a test/test-folder/"
+test/compare_du.sh "-l -a ./"
+test/compare_du.sh "-l -a include/"
+test/compare_du.sh "-l -a acutest/"
 
 # Testes com erro
 test/compare_du.sh "-l a"

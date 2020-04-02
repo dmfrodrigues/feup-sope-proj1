@@ -11,9 +11,16 @@
 static const char PARENT_DIR[] = "..";
 static const char THIS_DIR[] = ".";
 
+int simpledu_join_path(char *dest, const char *src){
+    size_t N = strlen(dest);
+    if(dest[N-1] != '/') strcat(dest, "/");
+    strcat(dest, src);
+    return EXIT_SUCCESS;
+}
+
 int simpledu_get_program_path(char *path) {
     if (getcwd(path, PATH_MAX) == NULL) return EXIT_FAILURE;
-    strcat(path, "/simpledu");
+    if (simpledu_join_path(path, "simpledu")) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
 
@@ -45,8 +52,8 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
                     strcmp(dir_point->d_name, THIS_DIR  ) == 0)
                     continue;
                 //New path
-                char new_path[PATH_MAX];
-                strcat(strcat(strcpy(new_path, path), "/"), dir_point->d_name);
+                char new_path[PATH_MAX]; strcpy(new_path, path);
+                if(simpledu_join_path(new_path, dir_point->d_name)) return EXIT_FAILURE;
                 // New mode
                 simpledu_mode_t new_mode;
                 if (simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;
