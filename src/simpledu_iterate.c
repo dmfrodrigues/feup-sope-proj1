@@ -146,7 +146,7 @@ int readline(int fd, char *str) {
     return EXIT_SUCCESS;
 }
 
-int simpledu_retrieve(int pipe_filedes, size_t reads_pipe, off_t *size) { char buf[1024];
+int simpledu_retrieve(int pipe_filedes, size_t reads_pipe, off_t *size) {
     *size = 0;
     if(pipe_filedes == -1) return EXIT_SUCCESS;
     //Repeat until an error exit code is returned
