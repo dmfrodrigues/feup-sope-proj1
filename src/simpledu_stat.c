@@ -7,11 +7,14 @@
 
 static const off_t stat_std_block_size = 512;
 
-off_t simpledu_stat(const char *path, bool apparent_size, off_t blocksize){
+off_t simpledu_stat(const char *path, bool apparent_size){
     struct stat buf;
     if(lstat(path, &buf)) return -1;
-    off_t result = (apparent_size ? buf.st_size : buf.st_blocks*stat_std_block_size);
-    return result/blocksize + (result%blocksize ? 1 : 0);
+    return (apparent_size ? buf.st_size : buf.st_blocks*stat_std_block_size);
+}
+
+off_t simpledu_block(off_t size, off_t blocksize){
+    return size/blocksize + (size%blocksize ? 1 : 0);
 }
 
 int simpledu_mode(const char *path, simpledu_mode_t *m){

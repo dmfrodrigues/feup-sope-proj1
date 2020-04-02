@@ -9,11 +9,13 @@
 /**
  * @brief Get size of file, in number of blocks.
  * 
- * @param path      Path of file
- * @param blocksize Block size in bytes
- * @return off_t    Number of blocks if successful, -1 if failed
+ * @param path          Path of file
+ * @param apparent_size Apparent or real size
+ * @return off_t        Size in bytes if successful, -1 if failed
  */
-off_t simpledu_stat(const char *path, bool bytes,off_t blocksize);
+off_t simpledu_stat(const char *path, bool apparent_size);
+
+off_t simpledu_block(off_t size, off_t blocksize);
 
 /**
  * @brief Mode of a file

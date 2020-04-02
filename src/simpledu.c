@@ -62,29 +62,13 @@ int main(int argc, char *argv[], char *envp[]){
     // Create log
     if(simpledu_log_CREATE(argc, (const char * const*)argv)) simpledu_exit(EXIT_FAILURE);
 
-    // DO NOT UNCOMMENT
-    
-    /*
-    int pid = fork();
-    if(pid > 0){ //parent
-
-    }else if(pid == 0){ //child
-        char path[PATH_MAX];
-        if(getcwd(path, PATH_MAX) == NULL) simpledu_exit(EXIT_FAILURE);
-        strcat(path, "/simpledu");
-        char **new_argv = NULL;
-        if(simpledu_args_toargv(&arg, &new_argv)) simpledu_exit(EXIT_FAILURE);
-        if(execve(path, new_argv, envp)) simpledu_exit(EXIT_FAILURE);
-    }else{
-        simpledu_exit(EXIT_FAILURE);
-    }
-    */
+    int ret = EXIT_SUCCESS;
 
     for(size_t i = 0; i < arg.filesc; ++i){
         int pipe_id; size_t num_reads_from_pipe;
         off_t size, more_size;
 
-        if(simpledu_iterate(arg.files[i], &pipe_id, &num_reads_from_pipe, &size, arg, envp)) simpledu_exit(EXIT_FAILURE);
+        if(simpledu_iterate(arg.files[i], &pipe_id, &num_reads_from_pipe, &size, arg, envp)){ ret = EXIT_FAILURE; continue; }
         if(simpledu_retrieve(pipe_id, num_reads_from_pipe, &more_size)) simpledu_exit(EXIT_FAILURE);
         if(simpledu_print(arg.files[i], size, more_size, arg)) simpledu_exit(EXIT_FAILURE);
     }
@@ -93,5 +77,5 @@ int main(int argc, char *argv[], char *envp[]){
         close(arg.pipe_filedes);
     }
 
-    simpledu_exit(EXIT_SUCCESS);
+    simpledu_exit(ret);
 }
