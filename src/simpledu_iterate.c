@@ -1,17 +1,11 @@
 #include "simpledu_iterate.h"
 
-#include <limits.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
-#include "simpledu_log.h"
 #include "simpledu_stat.h"
-#include "simpledu_time.h"
-#define __USE_GNU
-#include <errno.h>
-#include <unistd.h>
+
+#include <string.h>
+#include <dirent.h>
+#include <sys/wait.h>
+#include <stdio.h>
 
 static const char PARENT_DIR[] = "..";
 static const char THIS_DIR[] = ".";
@@ -21,8 +15,7 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
     *size = 0;
     // Get path
     char simpledu_path[PATH_MAX];{
-        if (getcwd(simpledu_path, PATH_MAX) == NULL)
-            simpledu_exit(EXIT_FAILURE);
+        if (getcwd(simpledu_path, PATH_MAX) == NULL) return EXIT_FAILURE;
         strcat(simpledu_path, "/simpledu");
     }
 

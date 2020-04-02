@@ -1,11 +1,5 @@
-#ifndef UNNAMED_FUNCTIONS_H_INCLUDED
-#define UNNAMED_FUNCTIONS_H_INCLUDED
-
-#include <errno.h>
-#include <stdlib.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <stdio.h>
+#ifndef SIMPLEDU_ITERATE_H_INCLUDED
+#define SIMPLEDU_ITERATE_H_INCLUDED
 
 #include "simpledu_args.h"
 
@@ -41,4 +35,4 @@ int simpledu_retrieve(int pipe_filedes, off_t *size);
  */
 int simpledu_print(const char *path, off_t size, off_t more_size, simpledu_args_t arg);
 
-#endif //UNNAMED_FUNCTIONS_H_INCLUDED
+#endif //SIMPLEDU_ITERATE_H_INCLUDED
