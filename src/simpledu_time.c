@@ -1,16 +1,27 @@
 #include "simpledu_time.h"
 
 #include <stdlib.h>
-#include <time.h>
 #include <errno.h>
 
-static clock_t start_time;
-static double ticks;
+#include <sys/time.h>
 
-int simpledu_starttime(){
-    start_time = clock();
-    if(start_time == -1) return EXIT_FAILURE;
-    ticks = CLOCKS_PER_SEC/1000.0;
+static micro_t microseconds_since_epoch = -1;
+
+int get_microseconds_since_epoch(micro_t *t){
+    struct timeval tv;
+    if(gettimeofday(&tv, NULL)) return EXIT_FAILURE;
+    *t = (micro_t)(tv.tv_sec)*1000000L + (micro_t)(tv.tv_usec);
+    return EXIT_SUCCESS;
+}
+
+int simpledu_starttime(micro_t *micros_since_epoch){
+    if(get_microseconds_since_epoch(&microseconds_since_epoch)) return EXIT_FAILURE;
+    *micros_since_epoch = microseconds_since_epoch;
+    return EXIT_SUCCESS;
+}
+
+int simpledu_set_starttime(micro_t micros_since_epoch){
+    microseconds_since_epoch = micros_since_epoch;
     return EXIT_SUCCESS;
 }
 
@@ -19,8 +30,9 @@ int simpledu_gettime(double *d){
         errno = EINVAL;
         return EXIT_FAILURE;
     }
-    clock_t now = clock();
-    if(now == -1) return EXIT_FAILURE;
-    *d = (double)(now - start_time)/ticks;
+    micro_t now;
+    if(get_microseconds_since_epoch(&now)) return EXIT_FAILURE;
+    now -= microseconds_since_epoch;
+    *d = (double)(now)/1000.0;
     return EXIT_SUCCESS;
 }

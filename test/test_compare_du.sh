@@ -2,8 +2,8 @@ set -e
 
 #test/compare_du.sh "-l test/test-folder"
 #test/compare_du.sh "-l test/test-folder -b"
-#test/compare_du.sh "-l test/test-folder -b -S"
-#test/compare_du.sh "-l test/test-folder -b -S --max-depth=2"
+test/compare_du.sh "-l test/test-folder -b -S"
+test/compare_du.sh "-l test/test-folder -b -S --max-depth=2"
 #test/compare_du.sh "-l test/test-folder -B 1"
 #test/compare_du.sh "-l test/test-folder -a"
 #test/compare_du.sh "-l test/test-folder -a -L"

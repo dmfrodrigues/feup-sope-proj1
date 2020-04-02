@@ -28,8 +28,32 @@ void test_simpledu_args_ctor1(void) {
 
 void test_simpledu_args_ctor2(void){
     int argc = 7;
-    const char *argv_const[8] = {"prog", "-a",  "-l", "-S", "--blocksize=300",
+    const char *argv_const[8] = {"prog", "-a",  "-l", "-S", "--block-size=1",
                                  "./a",  "./b", NULL};
+    char *argv[8];
+    argv[argc] = NULL;
+    for (int i = 0; i < argc; ++i) {
+        argv[i] = malloc((strlen(argv_const[i]) + 1)*sizeof(char));
+        strcpy(argv[i], argv_const[i]);
+    }
+    simpledu_args_t args;
+    TEST_CHECK(simpledu_args_ctor(&args, argc, argv) == EXIT_SUCCESS);
+    TEST_CHECK(args.all == true);
+    TEST_CHECK(args.block_size == 1);
+    TEST_CHECK(args.count_links == true);
+    TEST_CHECK(args.dereference == false);
+    TEST_CHECK(args.separate_dirs == true);
+    TEST_CHECK(args.max_depth >= PATH_MAX / 2);
+    TEST_CHECK(args.filesc == 2);
+    TEST_CHECK(strcmp(args.files[0], "./a") == 0);
+    TEST_CHECK(strcmp(args.files[1], "./b") == 0);
+    TEST_CHECK(simpledu_args_dtor(&args) == EXIT_SUCCESS);
+    for (int i = 0; i < argc; ++i){ free(argv[i]); argv[i] = NULL; }
+}
+
+void test_simpledu_args_ctor3(void){
+    int argc = 7;
+    const char *argv_const[8] = {"prog", "--all",  "--count-links",  "--separate-dirs", "--block-size=300", "./a", "./b", NULL};
     char *argv[8];
     argv[argc] = NULL;
     for (int i = 0; i < argc; ++i) {
@@ -51,7 +75,7 @@ void test_simpledu_args_ctor2(void){
     for (int i = 0; i < argc; ++i){ free(argv[i]); argv[i] = NULL; }
 }
 
-void test_simpledu_args_ctor3(void){
+void test_simpledu_args_ctor4(void){
     int argc = 7;
     const char *argv_const[8] = {"prog", "-a",  "-l",  "-S",
                                  "-B",   "./a", "./b", NULL};
@@ -157,6 +181,7 @@ TEST_LIST = {
     {"simpledu_args_ctor1"      , test_simpledu_args_ctor1      },
     {"simpledu_args_ctor2"      , test_simpledu_args_ctor2      },
     {"simpledu_args_ctor3"      , test_simpledu_args_ctor3      },
+    {"simpledu_args_ctor4"      , test_simpledu_args_ctor4      },
     {"simpledu_args_equal"      , test_simpledu_args_equal      },
     {"simpledu_args_copy"       , test_simpledu_args_copy       },
     {"simpledu_args_set_files"  , test_simpledu_args_set_files  },

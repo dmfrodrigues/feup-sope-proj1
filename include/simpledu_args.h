@@ -1,6 +1,7 @@
 #ifndef SIMPLEDU_ARGS_H_INCLUDED
 #define SIMPLEDU_ARGS_H_INCLUDED
 
+#include "simpledu_time.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <limits.h>
@@ -60,6 +61,8 @@ typedef struct {
      * set file descriptor to pipe to communicate with parent; should only be used by subprocesses
      */
     int pipe_filedes;
+
+    micro_t start_time;
     /**
      * @brief Size of files array.
      */

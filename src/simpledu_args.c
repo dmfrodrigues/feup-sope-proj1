@@ -16,12 +16,13 @@ static const simpledu_args_t simpledu_args_default =
 .separate_dirs = false, 
 .max_depth = PATH_MAX/2, 
 .log_filedes = -1, 
-.pipe_filedes = -1, 
+.pipe_filedes = -1,
+.start_time = -1,
 .filesc = 0, 
 .files = NULL
 };
 
-static const char optstring[] = "abLlSB:d:f:p:";
+static const char optstring[] = "abLlSB:d:f:p:s:";
 static int apparent_size = false;
 static const struct option longopts[] = {
     {"all"          , 0, NULL, 'a'},
@@ -29,11 +30,12 @@ static const struct option longopts[] = {
     {"dereference"  , 0, NULL, 'L'},
     {"count-links"  , 0, NULL, 'l'},
     {"separate-dirs", 0, NULL, 'S'},
-    {"apparent-size", 1, &apparent_size, 1},
-    {"blocksize"    , 1, NULL, 'B'},
+    {"apparent-size", 0, &apparent_size, 1},
+    {"block-size"   , 1, NULL, 'B'},
     {"max-depth"    , 1, NULL, 'd'},
     {"log-filedes"  , 1, NULL, 'f'},
     {"pipe-filedes" , 1, NULL, 'p'},
+    {"start-time"   , 1, NULL, 's'},
     {0,0,0,0}
 };
 
@@ -52,10 +54,11 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
             case 'L': p->dereference   = true; break;
             case 'l': p->count_links   = true; break;
             case 'S': p->separate_dirs = true; break;
-            case 'B': if(sscanf(optarg, "%llu", &p->block_size  ) != 1) return EXIT_FAILURE; break;
-            case 'd': if(sscanf(optarg, "%hu" , &p->max_depth   ) != 1) return EXIT_FAILURE; break;
-            case 'f': if(sscanf(optarg, "%d"  , &p->log_filedes ) != 1) return EXIT_FAILURE; break;
-            case 'p': if(sscanf(optarg, "%d"  , &p->pipe_filedes) != 1) return EXIT_FAILURE; break;
+            case 'B': if(sscanf(optarg, "%llu" , &p->block_size  ) != 1) return EXIT_FAILURE; break;
+            case 'd': if(sscanf(optarg, "%hu"  , &p->max_depth   ) != 1) return EXIT_FAILURE; break;
+            case 'f': if(sscanf(optarg, "%d"   , &p->log_filedes ) != 1) return EXIT_FAILURE; break;
+            case 'p': if(sscanf(optarg, "%d"   , &p->pipe_filedes) != 1) return EXIT_FAILURE; break;
+            case 's': if(sscanf(optarg, "%lldd", &p->start_time  ) != 1) return EXIT_FAILURE; break;
             case 0:
                 if(apparent_size){
                     p->apparent_size = true;
@@ -120,6 +123,9 @@ bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2){
         p1->dereference     == p2->dereference      &&
         p1->separate_dirs   == p2->separate_dirs    &&
         p1->max_depth       == p2->max_depth        && 
+        p1->log_filedes     == p2->log_filedes      && 
+        p1->pipe_filedes    == p2->pipe_filedes     && 
+        p1->start_time      == p2->start_time       && 
         p1->filesc          == p2->filesc
     )) return false;
     for(size_t i = 0; i < p1->filesc; ++i){
@@ -138,6 +144,7 @@ int simpledu_args_copy(simpledu_args_t *p1, const simpledu_args_t *p2){
     p1->max_depth       = p2->max_depth;
     p1->log_filedes     = p2->log_filedes;
     p1->pipe_filedes    = p2->pipe_filedes;
+    p1->start_time      = p2->start_time;
     p1->filesc          = p2->filesc;
     p1->files = malloc(p1->filesc*sizeof(char*));
     for(size_t i = 0; i < p1->filesc; ++i){
@@ -167,7 +174,7 @@ int simpledu_args_set_files(simpledu_args_t *p, int num,...){
     return EXIT_SUCCESS;
 }
 
-#define TOARGV_MIN_ARGC 8
+#define TOARGV_MIN_ARGC 32
 #define TOARGV_BUF_SIZE 4096
 
 int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv){
@@ -180,14 +187,15 @@ int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv){
     {                     strcpy(buf, "./simpledu"     ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //Program name
     if(p->all          ){ strcpy(buf, "-a"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-a, --all
     if(p->apparent_size){ strcpy(buf, "--apparent-size"); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-a, --all
-    { sprintf(buf, "--blocksize=%llu"  , p->block_size ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-B, --blocksize
+    { sprintf(buf, "--block-size=%llu"  , p->block_size); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-B, --blocksize
     if(p->count_links  ){ strcpy(buf, "-l"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-l, --count-links
     if(p->dereference  ){ strcpy(buf, "-L"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-L, --dereference
     if(p->separate_dirs){ strcpy(buf, "-S"             ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-S, --separate-dirs
     { sprintf(buf, "--max-depth=%hu"  , p->max_depth   ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //-d, --max-depth
     { sprintf(buf, "--log-filedes=%d" , p->log_filedes ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //log_filedes
-    { sprintf(buf, "--pipe-filedes=%d", p->pipe_filedes); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //log_filedes
-
+    { sprintf(buf, "--pipe-filedes=%d", p->pipe_filedes); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //pipe_filedes
+    { sprintf(buf, "--start-time=%lld", p->start_time  ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //pipe_filedes
+    
     for(int j = 0; j < p->filesc; ++i, ++j){
         argv[i] = malloc((strlen(p->files[j])+1)*sizeof(char));
         strcpy(argv[i], p->files[j]);

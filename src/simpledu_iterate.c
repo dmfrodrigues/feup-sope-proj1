@@ -8,6 +8,7 @@
 
 #include "simpledu_log.h"
 #include "simpledu_stat.h"
+#include "simpledu_time.h"
 #define __USE_GNU
 #include <errno.h>
 #include <unistd.h>
@@ -53,14 +54,12 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
 
                 // Display results from children here
             } else if (pid == 0) {  // child
-                simpledu_args_t new_arg;
-                if(simpledu_args_copy(&new_arg, &arg)) return EXIT_FAILURE;
-                --new_arg.max_depth;
+                --arg.max_depth;
 
-                if(simpledu_args_set_files(&new_arg, 1, new_path)) return EXIT_FAILURE;
+                if(simpledu_args_set_files(&arg, 1, new_path)) return EXIT_FAILURE;
 
                 char **new_argv = NULL;
-                if (simpledu_args_toargv(&new_arg, &new_argv)) return EXIT_FAILURE;
+                if (simpledu_args_toargv(&arg, &new_argv)) return EXIT_FAILURE;
                 if (execve(simpledu_path, new_argv, envp)) return EXIT_FAILURE;
             }
         }

@@ -28,12 +28,4 @@ int simpledu_envp_ctor(simpledu_envp_t *p, char *envp[]);
  */
 int simpledu_envp_dtor(simpledu_envp_t *p);
 
-/**
- * @brief       Sets the EXEC_PATH enviroment variable
- * 
- * @param envp  Environment variables, NULL-terminated array of strings
- * @return int  EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
- */
-int simpledu_set_exec_path(char *envp[]);
-
 #endif //SIMPLEDU_ENVP_H_INCLUDED
