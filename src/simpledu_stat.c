@@ -24,24 +24,6 @@ int simpledu_mode(const char *path, simpledu_mode_t *m){
     return EXIT_SUCCESS;
 }
 
-bool simpledu_symb_link(const char *path) {
-    struct stat buf;
-    if(lstat(path, &buf)) return -1;
-    return S_ISLNK(buf.st_mode);
-}
-
-bool simpledu_dir(const char *path) {
-    struct stat buf;
-    if(lstat(path, &buf)) return 0;
-    return S_ISDIR(buf.st_mode);
-}
-
-bool simpledu_reg_file(const char *path) {
-    struct stat buf;
-    if(lstat(path, &buf)) return 0;
-    return S_ISREG(buf.st_mode);
-}
-
 off_t simpledu_file_size(const char *path) {
     struct stat buf;
     if(lstat(path, &buf)) return -1;

@@ -18,8 +18,12 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
         if (getcwd(simpledu_path, PATH_MAX) == NULL) return EXIT_FAILURE;
         strcat(simpledu_path, "/simpledu");
     }
+    // Mode
+    simpledu_mode_t mode;
+    if(simpledu_mode(path, &mode)) return EXIT_FAILURE;
 
-    if (!simpledu_dir(path)) return EXIT_FAILURE;
+    //if (!simpledu_dir(path)) return EXIT_FAILURE;
+    if (mode != simpledu_mode_dir) return EXIT_FAILURE;
 
     DIR *dir_to_iter = opendir(path);
     if (dir_to_iter == NULL) return EXIT_FAILURE;
@@ -34,9 +38,13 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
         char new_path[PATH_MAX];
         strcat(strcat(strcpy(new_path, path), "/"), dir_point->d_name);
 
-        // if dir
-        if (simpledu_dir(new_path)) {
+        //New mode
+        simpledu_mode_t new_mode;
+        if(simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;
 
+        // if dir
+        if (new_mode == simpledu_mode_dir) {
+        
             int pid = fork();
             int status;
 
@@ -55,8 +63,7 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
                 if (simpledu_args_toargv(&arg, &new_argv)) return EXIT_FAILURE;
                 if (execve(simpledu_path, new_argv, envp)) return EXIT_FAILURE;
             }
-        }
-        else if (simpledu_symb_link(new_path)) {
+        } else if (new_mode == simpledu_mode_lnk) {
             if (arg.dereference) {
                 
                 char symb_link_buf[PATH_MAX];
@@ -88,9 +95,7 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
                     printf("%ld\t%s\n", file_size,  new_path);
                 }
             }
-        }
-
-        else if (simpledu_reg_file(new_path)) { //printf("  IS A REG FILE\n");
+        } else if (new_mode == simpledu_mode_reg){ 
             off_t file_size = simpledu_stat(new_path, arg.apparent_size, arg.block_size);
             if(file_size == -1) return EXIT_FAILURE;
             *size += file_size;

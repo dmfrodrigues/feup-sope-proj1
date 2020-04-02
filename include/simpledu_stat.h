@@ -35,31 +35,6 @@ typedef enum {
 int simpledu_mode(const char *path, simpledu_mode_t *m);
 
 /**
- * @brief Check if a file is a symbolic link or not.
- * 
- * @param path      Path of file
- * @return int      1 if symbolic link; -1 in case of error; 0 otherwise
- */
-bool simpledu_symb_link(const char *path);
-
-/**
- * @brief Check if a file is a directory or not.
- * 
- * @param path      Path of file
- * @return int      1 if directory; -1 in case of error; 0 otherwise
- */
-bool simpledu_dir(const char *path);
-
-/**
- * @brief           Check if a file is a regular file or not.
- * 
- * @param path      Path of file
- * @return int      1 if regular file; -1 in case of error; 0 otherwise
- */
-bool simpledu_reg_file(const char *path);
-
-
-/**
  * @brief Gives the number of bytes of a file.
  * 
  * @param path      Path of file
