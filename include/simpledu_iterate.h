@@ -13,7 +13,7 @@
  * @param size      To store size of folder contents (not counting subfolders)
  * @return int      EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
  */
-int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *pipe_id, off_t *size);
+int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *size, simpledu_args_t arg, char *envp[]);
 
 /**
  * @brief Retrieve data from pipe.
@@ -22,7 +22,7 @@ int simpledu_iterate(const char *path, simpledu_args_t arg, char *envp[], int *p
  * @param size          To store size of retrieved data
  * @return int          EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
  */
-int simpledu_retrieve(int pipe_filedes, off_t *size);
+int simpledu_retrieve(int pipe_filedes, size_t reads_pipe, off_t *size);
 
 /**
  * @brief Print size of folder.
