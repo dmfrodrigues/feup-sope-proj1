@@ -23,7 +23,7 @@ int simpledu_get_program_path(char *path, size_t n) {
     return EXIT_SUCCESS;
 }
 
-int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *size, simpledu_args_t arg, char *envp[]) {
+int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_t arg, char *envp[]) {
     int ret = EXIT_SUCCESS;
     // Size
     *size = 0;
@@ -31,7 +31,6 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
     int filedes[2];
     if(pipe(filedes)) return EXIT_FAILURE;
     *pipe_id = filedes[0];
-    *reads_pipe = 0;
     // Get path
     char simpledu_path[PATH_MAX];
     if (simpledu_get_program_path(simpledu_path, PATH_MAX-1)) return EXIT_FAILURE;
@@ -73,13 +72,10 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
                 if (simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;
                 switch(new_mode){
                     case simpledu_mode_dir: {
-                        ++(*reads_pipe);
                         int pid = fork();
-                        int status;
 
                         if (pid > 0) {  // parent
-                            waitpid(-1, &status, 0);
-                            if(status) ret = 2;
+
                         } else if (pid == 0) {  // child
                             --arg.max_depth;
                             close(filedes[0]);
@@ -166,17 +162,18 @@ int readline(int fd, char *str) {
     return EXIT_SUCCESS;
 }
 
-int simpledu_retrieve(int pipe_filedes, size_t reads_pipe, off_t *size) {
+int simpledu_retrieve(int pipe_filedes, off_t *size) {
+    int ret = EXIT_SUCCESS;
     *size = 0;
     if(pipe_filedes == -1) return EXIT_SUCCESS;
     //Repeat until an error exit code is returned
     char line[PIPE_BUF];
-    /*
-    int r, ret;
-    while((r = waitpid(-1, &ret, 0)) >= 0){
+    
+    int r, status;
+    while((r = waitpid(-1, &status, 0)) >= 0){
         //If a child has returned
         if(r > 0){
-            if(ret) return EXIT_FAILURE;
+            if(status) ret = 2;
             if(readline(pipe_filedes, line)) return EXIT_FAILURE;
             off_t more_size;
             if(sscanf(line, "%ld", &more_size)!=1) return EXIT_FAILURE;
@@ -184,14 +181,7 @@ int simpledu_retrieve(int pipe_filedes, size_t reads_pipe, off_t *size) {
         }
     }
     if(errno != ECHILD) return EXIT_FAILURE;
-     */
-    for(size_t i = 0; i < reads_pipe; ++i){
-        if(readline(pipe_filedes, line)) return EXIT_FAILURE;
-        off_t more_size;
-        if(sscanf(line, "%ld", &more_size)!=1) return EXIT_FAILURE;
-        *size += more_size;
-    }
-    return EXIT_SUCCESS;
+    return ret;
 }
 
 int simpledu_print(const char *path, off_t size, off_t more_size, simpledu_args_t arg) {
