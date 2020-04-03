@@ -15,14 +15,14 @@ SIMPLEDU_ERR=/tmp/simpledu.err
 DU_OUT=/tmp/du.out
 DU_ERR=/tmp/du.err
 
-s="${NC_INTENSIVE}Test with args '$1'...${NC}"
-printf %-72b "$s"
+s="${NC_INTENSIVE}Test '$1' with args '$2'...${NC}"
+printf %-88b "$s"
 
-#(./simpledu $1 || echo $?) | sort -k2 > $SIMPLEDU_OUT 2> $SIMPLEDU_ERR
-#(du         $1 || echo $?) | sort -k2 > $DU_OUT 2> $DU_ERR
-./simpledu $1 2> $SIMPLEDU_ERR | sort -k2 > $SIMPLEDU_OUT
+#(./simpledu $2 || echo $?) | sort -k2 > $SIMPLEDU_OUT 2> $SIMPLEDU_ERR
+#(du         $2 || echo $?) | sort -k2 > $DU_OUT 2> $DU_ERR
+$1 $2 2> $SIMPLEDU_ERR | sort -k2 > $SIMPLEDU_OUT
 simpledu_exit="${PIPESTATUS[0]}"
-du         $1 2> $DU_ERR       | sort -k2 > $DU_OUT
+du         $2 2> $DU_ERR       | sort -k2 > $DU_OUT
 du_exit="${PIPESTATUS[0]}" 
 EXIT_STATUS=0
 diff -q $SIMPLEDU_OUT $DU_OUT > /dev/null 2>&1 || EXIT_STATUS=$?

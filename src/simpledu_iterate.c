@@ -18,9 +18,8 @@ int simpledu_join_path(char *dest, const char *src){
     return EXIT_SUCCESS;
 }
 
-int simpledu_get_program_path(char *path) {
-    if (getcwd(path, PATH_MAX) == NULL) return EXIT_FAILURE;
-    if (simpledu_join_path(path, "simpledu")) return EXIT_FAILURE;
+int simpledu_get_program_path(char *path, size_t n) {
+    readlink("/proc/self/exe", path, n);
     return EXIT_SUCCESS;
 }
 
@@ -34,7 +33,7 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
     *reads_pipe = 0;
     // Get path
     char simpledu_path[PATH_MAX];
-    if (simpledu_get_program_path(simpledu_path)) return EXIT_FAILURE;
+    if (simpledu_get_program_path(simpledu_path, PATH_MAX-1)) return EXIT_FAILURE;
     // Mode
     simpledu_mode_t mode;
     if (simpledu_mode(path, &mode)){
