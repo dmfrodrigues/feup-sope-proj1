@@ -19,11 +19,12 @@ int simpledu_join_path(char *dest, const char *src){
 }
 
 int simpledu_get_program_path(char *path, size_t n) {
-    readlink("/proc/self/exe", path, n);
+    if(readlink("/proc/self/exe", path, n) == -1) return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
 
 int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *size, simpledu_args_t arg, char *envp[]) {
+    int ret = EXIT_SUCCESS;
     // Size
     *size = 0;
     // Pipe
@@ -40,10 +41,24 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
         fprintf(stderr, "du: cannot access '%s': No such file or directory\n", path);
         return EXIT_FAILURE;
     }
+    off_t folder_size = simpledu_stat(path, arg.apparent_size);
+    if(folder_size == -1) return EXIT_FAILURE;
+    *size += folder_size;
     switch (mode) {
         case simpledu_mode_dir:{
             DIR *dir_to_iter = opendir(path);
-            if (dir_to_iter == NULL) return EXIT_FAILURE;
+            if (dir_to_iter == NULL){
+                switch(errno){
+                    case EACCES:
+                        fprintf(stderr, "du: cannot read directory '%s': Permission denied\n", path);
+                        break;
+                    default:
+                        break;
+                }
+                close(filedes[0]);
+                close(filedes[1]);
+                return EXIT_FAILURE;
+            }
             // Iterating over the items of a directory
             struct dirent *dir_point = NULL;
             while ((dir_point = readdir(dir_to_iter)) != NULL) {
@@ -64,7 +79,7 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
 
                         if (pid > 0) {  // parent
                             waitpid(-1, &status, 0);
-                            if(status) return EXIT_FAILURE;
+                            if(status) ret = 2;
                         } else if (pid == 0) {  // child
                             --arg.max_depth;
                             close(filedes[0]);
@@ -126,8 +141,6 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
                 }
             }
 
-            // After iterating over directory, will try to display results
-            *size += simpledu_stat(path, arg.apparent_size);
             closedir(dir_to_iter);
 
             break;
@@ -137,7 +150,7 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
 
     close(filedes[1]);
 
-    return EXIT_SUCCESS;
+    return ret;
 }
 
 int readline(int fd, char *str) {
@@ -189,7 +202,7 @@ int simpledu_print(const char *path, off_t size, off_t more_size, simpledu_args_
     if(arg.pipe_filedes != -1){
         char buf[PIPE_BUF];
         sprintf(buf, "%ld\n", size+more_size);
-        write(arg.pipe_filedes, buf, strlen(buf));
+        if(write(arg.pipe_filedes, buf, strlen(buf)) != strlen(buf)) return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }

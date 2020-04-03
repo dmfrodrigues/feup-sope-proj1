@@ -10,7 +10,7 @@ ODIR   =./obj
 TDIR   =./test
 TEXE   =test
 
-CFLAGS =-Wall -O0 -g $(IFLAGS)
+CFLAGS =-Wall -O3 -g $(IFLAGS)
 
 all: makefolders $(PROG)
 

@@ -62,16 +62,30 @@ int main(int argc, char *argv[], char *envp[]){
     // Create log
     if(simpledu_log_CREATE(argc, (const char * const*)argv)) simpledu_exit(EXIT_FAILURE);
 
-    int ret = EXIT_SUCCESS;
+    int r, ret = EXIT_SUCCESS;
 
     for(size_t i = 0; i < arg.filesc; ++i){
         int pipe_id; size_t num_reads_from_pipe;
         off_t size, more_size;
 
-        if(simpledu_iterate(arg.files[i], &pipe_id, &num_reads_from_pipe, &size, arg, envp)){ ret = EXIT_FAILURE; continue; }
-        if(simpledu_retrieve(pipe_id, num_reads_from_pipe, &more_size)) simpledu_exit(EXIT_FAILURE);
+        if((r = simpledu_iterate(arg.files[i], &pipe_id, &num_reads_from_pipe, &size, arg, envp))){
+            ret = EXIT_FAILURE;
+            if     (errno == ENOENT) continue;
+            else if(errno == EACCES){ /*printf("%d, Dont have permission\n", getpid());*/ }
+            else if(r == 2) { /*printf("%d, Received a child error exit code ====================================================\n", getpid());*/ }
+            else continue;
+        }
+        //printf("%d, here i am\n", getpid());
+        if(simpledu_retrieve(pipe_id, num_reads_from_pipe, &more_size)){
+            //printf("%d, something went wrong\n", getpid());
+            ret = EXIT_FAILURE;
+        }
+        //printf("%d, still here\n", getpid());
         if(simpledu_print(arg.files[i], size, more_size, arg)) simpledu_exit(EXIT_FAILURE);
+        //printf("%d, and here, i=%ld, filesc=%ld, files[i]=%s\n", getpid(), i, arg.filesc, arg.files[i]);
     }
+
+    //printf("%d, exiting\n", getpid());
 
     if(arg.pipe_filedes != -1){
         close(arg.pipe_filedes);
