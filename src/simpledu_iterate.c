@@ -5,6 +5,8 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <libgen.h>
+#include <stdlib.h>
 
 #include "simpledu_stat.h"
 
@@ -75,31 +77,55 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
                         }
                     } break;
                     case simpledu_mode_lnk: {
+
                         if (arg.dereference) {
+
+                            char resolved_path[PATH_MAX];
+                            realpath(new_path, resolved_path);
+                            // printf("\nResolved Path: %s\n", new_path);
+                            strcpy(resolved_path, new_path);
+                            DIR * error_open;
+                            if ( (error_open = opendir(resolved_path)) != NULL) {
+                                struct dirent *dir_point_2 = NULL;
+                                dir_point_2 = readdir(error_open);
+                                // printf("\nName: %s", dir_point_2->d_name);
+                                simpledu_join_path(new_path, dir_point_2->d_name);
+                                off_t symb_link_file_size_2 = simpledu_stat(new_path, arg.apparent_size);
+                                *size += symb_link_file_size_2;
+                                // pritnf("\n%ld", symb_link_file_size_2);
+                                printf("%ld\t%s\n", simpledu_block(symb_link_file_size_2, arg.block_size), new_path);
+                                // printf("\nTEXT FILE: %s", resolved_path);
+                                // off_t file_size_2 = simpledu_stat_2(new_path, arg.apparent_size);
+                                // printf("%ld\t%s\n", simpledu_block(file_size_2, arg.block_size), new_path);
+                                // printf("\nOpen symb link dir functioned! Nice!");
+                                // readdir(error_open);
+                            }
+
+                            /*
                             char symb_link_buf[PATH_MAX];
-                            ssize_t len = readlink(dir_point->d_name, symb_link_buf,
-                                                sizeof(symb_link_buf) - 1);
+                            ssize_t len = readlink(new_path, symb_link_buf, sizeof(symb_link_buf) - 1);
 
                             // if no error occured
                             if (len != -1) symb_link_buf[len] = '\0';
+                            */
 
-                            // symb_link_buf -> Path of symb link relative to the
-                            // directory. Examples:
-                            //      ../testing_2/testing_symb_link_2_pls_work.txt
-                            //      ./testtt/to_symb_link.txt
+                            // printf("new path: %s", new_path);
 
-                            off_t symb_link_file_size = simpledu_stat(symb_link_buf, arg.apparent_size);
+                            // printf("\nsymb link path:%s \n", resolved_path);
+                            off_t symb_link_file_size = simpledu_stat_2(resolved_path, arg.apparent_size);
+                            // printf("\nsymb_link_file_size: %ld\n", symb_link_file_size);
                             if (symb_link_file_size == -1) return EXIT_FAILURE;
 
                             *size += symb_link_file_size;
-                            // If it needs to display file size
+
                             if (arg.max_depth > 0 && arg.all) {
-                                printf("%ld\t%s\n", simpledu_block(symb_link_file_size, arg.block_size),
-                                    symb_link_buf);
+
+                                printf("%ld\t%s\n", simpledu_block(*size, arg.block_size), resolved_path);
                             }
                         } else {  // -L was not passed as argument. Process as if it
                                 // was a regular file.
                             // display size and relative path/(name)
+                            printf("\nups.I'm not regular.\n");
                             off_t file_size = simpledu_stat(new_path, arg.apparent_size);
                             if (file_size == -1) return EXIT_FAILURE;
                             *size += file_size;
