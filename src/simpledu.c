@@ -9,10 +9,10 @@
 #include "simpledu_time.h"
 #include "simpledu_log.h"
 #include "simpledu_iterate.h"
+#include "simpledu_signals.h"
 
 #define FILEDES_INVALID -1
 
-simpledu_args_t arg;
 simpledu_envp_t env;
 
 int simpledu_init(int argc, char *argv[], char *envp[]){
@@ -30,6 +30,10 @@ void simpledu_clean(){
 }
 
 int main(int argc, char *argv[], char *envp[]){
+    //INITIALIZE HANDLER
+    if (simpledu_handler()){
+        return EXIT_FAILURE;
+    }
 
     if(simpledu_init(argc, argv, envp)) simpledu_exit(EXIT_FAILURE);
     if(atexit(simpledu_clean)) simpledu_exit(EXIT_FAILURE);

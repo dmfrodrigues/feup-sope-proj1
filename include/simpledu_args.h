@@ -64,7 +64,7 @@ typedef struct {
 
     micro_t start_time;
 
-    int children_process_group;
+    pid_t children_process_group;
     /**
      * @brief Size of files array.
      */
@@ -132,5 +132,7 @@ int simpledu_args_set_files(simpledu_args_t *p, int num,...);
  * @return int  EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
  */
 int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv);
+
+simpledu_args_t arg;
 
 #endif //SIMPLEDU_ARGS_H_INCLUDED

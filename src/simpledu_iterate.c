@@ -24,6 +24,8 @@ int simpledu_get_program_path(char *path, size_t n) {
 }
 
 int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_t arg, char *envp[]) {
+    sleep(1);
+
     int ret = EXIT_SUCCESS;
     // Size
     *size = 0;
@@ -72,11 +74,20 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                 if (simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;
                 switch(new_mode){
                     case simpledu_mode_dir: {
-                        int pid = fork();
+                        pid_t pid = fork();
 
                         if (pid > 0) {  // parent
-
+                            if(arg.children_process_group == 0){ //This is the first child of second process group
+                                arg.children_process_group = pid;
+                            }
                         } else if (pid == 0) {  // child
+                            if(arg.children_process_group == 0){ //This check must be done twice
+                                arg.children_process_group = getpid();
+                                setpgid(0, getpid());
+                            }
+                            else {
+                                setpgid(0, arg.children_process_group);
+                            }
                             --arg.max_depth;
                             close(filedes[0]);
                             arg.pipe_filedes = filedes[1];
