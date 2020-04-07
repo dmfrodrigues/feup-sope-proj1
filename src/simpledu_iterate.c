@@ -25,6 +25,81 @@ int simpledu_get_program_path(char *path, size_t n) {
     return EXIT_SUCCESS;
 }
 
+
+int simpledu_process(const char* simpledu_path, int filedes[2], struct dirent *dir_point, const char *path, off_t *size, simpledu_args_t arg, char *envp[]) {
+    if (strcmp(dir_point->d_name, PARENT_DIR) == 0 || strcmp(dir_point->d_name, THIS_DIR  ) == 0) return 0; // ????
+    
+    // New path
+    char new_path[PATH_MAX]; strcpy(new_path, path);
+    printf("New path 1: %s\n", new_path);
+    if(simpledu_join_path(new_path, dir_point->d_name)) return EXIT_FAILURE;
+    printf("New path 2: %s\n", new_path);
+    // New mode
+    simpledu_mode_t new_mode;
+    if (simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;
+    
+    if (new_mode == simpledu_mode_dir) {
+        // printf("Dir\n");
+        int pid = fork();
+        int status;
+
+        if (pid > 0) {  // parent
+            waitpid(-1, &status, 0);
+            if(status) return EXIT_FAILURE;
+        } else if (pid == 0) {  // child
+            --arg.max_depth;
+            close(filedes[0]);
+            arg.pipe_filedes = filedes[1];
+
+            if (simpledu_args_set_files(&arg, 1, new_path))
+                return EXIT_FAILURE;
+
+            char **new_argv = NULL;
+            if (simpledu_args_toargv(&arg, &new_argv)) return EXIT_FAILURE;
+            if (execve(simpledu_path, new_argv, envp)) return EXIT_FAILURE;
+        }
+    }
+    else if (new_mode == simpledu_mode_lnk) {
+        // printf("Symb Link\n");
+        if (arg.dereference) {  // if -L
+            // printf("Dereferencing\n");
+            char resolved_path[PATH_MAX];
+            if (realpath(new_path, resolved_path) == NULL) return EXIT_FAILURE;
+            
+            printf("New      Path: %s\n", new_path);
+            printf("Resolved Path: %s\n", resolved_path);
+            strcpy(resolved_path, new_path);
+            
+            simpledu_process(simpledu_path, filedes, dir_point, resolved_path, size, arg, envp);
+        }
+
+        else {  // -L was not passed as argument. Process as if it was a regular file.
+
+            off_t file_size = simpledu_stat(new_path, arg.apparent_size);
+            if (file_size == -1) return EXIT_FAILURE;
+
+            *size += file_size;
+
+            if (arg.max_depth > 0 && arg.all) {
+                printf("%ld\t%s\n", simpledu_block(file_size, arg.block_size), new_path);
+            }
+        }
+    }
+
+    else if (new_mode == simpledu_mode_reg) {
+        // printf("Reg\n");
+        off_t file_size = simpledu_stat(new_path, arg.apparent_size);
+        if (file_size == -1) return EXIT_FAILURE;
+
+        *size += file_size;
+
+        if (arg.max_depth > 0 && arg.all)
+            printf("%ld\t%s\n", simpledu_block(file_size, arg.block_size), new_path);
+    }
+
+   return EXIT_SUCCESS;
+}
+
 int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_t arg, char *envp[]) {
     int ret = EXIT_SUCCESS;
     // Size
@@ -63,6 +138,8 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
             // Iterating over the items of a directory
             struct dirent *dir_point = NULL;
             while ((dir_point = readdir(dir_to_iter)) != NULL) {
+                simpledu_process(simpledu_path, filedes, dir_point, path, size, arg, envp);
+                /*
                 if (strcmp(dir_point->d_name, PARENT_DIR) == 0 ||
                     strcmp(dir_point->d_name, THIS_DIR  ) == 0)
                     continue;
@@ -108,10 +185,10 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                                 // printf("\nName: %s", dir_point_2->d_name);
                                 simpledu_join_path(new_path, dir_point_2->d_name);
                                 off_t symb_link_file_size_2 = simpledu_stat(new_path, arg.apparent_size);
-                                //*size += symb_link_file_size_2;
+                                // *size += symb_link_file_size_2;
                                 // pritnf("\n%ld", symb_link_file_size_2);
                                 printf("%ld\t%s\n", simpledu_block(symb_link_file_size_2, arg.block_size), new_path);
-                                *size += symb_link_file_size_2;
+                              // *size += symb_link_file_size_2;
                                 // printf("\nTEXT FILE: %s", resolved_path);
                                 // off_t file_size_2 = simpledu_stat_2(new_path, arg.apparent_size);
                                 // printf("%ld\t%s\n", simpledu_block(file_size_2, arg.block_size), new_path);
@@ -119,13 +196,13 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                                 // readdir(error_open);
                             }
 
-                            /*
-                            char symb_link_buf[PATH_MAX];
-                            ssize_t len = readlink(new_path, symb_link_buf, sizeof(symb_link_buf) - 1);
+                            
+                            // char symb_link_buf[PATH_MAX];
+                            // ssize_t len = readlink(new_path, symb_link_buf, sizeof(symb_link_buf) - 1);
 
-                            // if no error occured
-                            if (len != -1) symb_link_buf[len] = '\0';
-                            */
+                            // // if no error occured
+                            // if (len != -1) symb_link_buf[len] = '\0';
+                            
 
                             // printf("new path: %s", new_path);
 
@@ -164,7 +241,8 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                     } break;
                     default: break;
                 }
-            }
+                */
+            } 
 
             closedir(dir_to_iter);
 
