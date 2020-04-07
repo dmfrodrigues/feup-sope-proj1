@@ -183,19 +183,41 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
 
                             char resolved_path[PATH_MAX];
                             if (realpath(new_path, resolved_path) == NULL) return EXIT_FAILURE;
-                            // printf("\nResolved Path: %s\n", new_path);
-                            strcpy(resolved_path, new_path);
+                            // strcpy(resolved_path, new_path);
+                            // resolved path -> actual full path for the symbolic link
+                            // new path      -> path until reaching the symbolic link
+
+                            int pid = fork();
+
+                            if (pid > 0) {  // parent
+
+                            } else if (pid == 0) {  // child
+                                --arg.max_depth;
+                                close(filedes[0]);
+                                arg.pipe_filedes = filedes[1];
+
+                                if (simpledu_args_set_files(&arg, 1, resolved_path))
+                                    return EXIT_FAILURE;
+
+                                char **new_argv = NULL;
+                                if (simpledu_args_toargv(&arg, &new_argv))
+                                    return EXIT_FAILURE;
+                                if (execve(simpledu_path, new_argv, envp))
+                                    return EXIT_FAILURE;
+                            }
+                            /*
                             DIR * error_open;
                             if ( (error_open = opendir(resolved_path)) != NULL) {
                                 struct dirent *dir_point_2 = NULL;
                                 dir_point_2 = readdir(error_open);
+                                
                                 // printf("\nName: %s", dir_point_2->d_name);
                                 simpledu_join_path(new_path, dir_point_2->d_name);
                                 off_t symb_link_file_size_2 = simpledu_stat(new_path, arg.apparent_size);
                                 
                                 *size += symb_link_file_size_2;
                                 // pritnf("\n%ld", symb_link_file_size_2);
-                                // printf("\nHere\n");
+                                printf("\nHere\n");
                                 printf("%ld\t%s\n", simpledu_block(symb_link_file_size_2, arg.block_size), new_path);
                                 // *size += symb_link_file_size_2;
 
@@ -214,6 +236,7 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                             }
                             
                             *size += symb_link_file_size;
+                            */
 
                         } else {  // -L was not passed as argument. Process as if it
                                 // was a regular file.
