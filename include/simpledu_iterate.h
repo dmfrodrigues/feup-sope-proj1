@@ -7,13 +7,13 @@
  * @brief Iterate over content of a folder.
  * 
  * @param path      Path of folder to iterate over
- * @param arg       Argument structure
- * @param envp      Environment variables
  * @param pipe_id   To store pipe file descriptor to be read to get subdirectories size
  * @param size      To store size of folder contents (not counting subfolders)
+ * @param arg       Argument structure
+ * @param envp      Environment variables
  * @return int      EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
  */
-int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *size, simpledu_args_t arg, char *envp[]);
+int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_t arg, char *envp[]);
 
 /**
  * @brief Retrieve data from pipe.
@@ -22,7 +22,7 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
  * @param size          To store size of retrieved data
  * @return int          EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
  */
-int simpledu_retrieve(int pipe_filedes, size_t reads_pipe, off_t *size);
+int simpledu_retrieve(int pipe_filedes, off_t *size);
 
 /**
  * @brief Print size of folder.
