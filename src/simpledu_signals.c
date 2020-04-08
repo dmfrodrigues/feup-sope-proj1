@@ -5,14 +5,21 @@
 
 #include <stdio.h> 
 #include <signal.h>
+#include <unistd.h>
+#include <string.h>
+
 
 int simpledu_handler(){
     struct sigaction action;
     sigset_t sigmask;
     pid_t pgid = arg.children_process_group;
+    char temp[999];
+    sprintf(temp, "HANDLER INST %d/%d\n", getpgrp(), pgid);
+    write(1, temp, strlen(temp));
     if (pgid == 0) { //First process, will handle second group
         action.sa_handler = sigint_handler;
         sigemptyset(&action.sa_mask);
+        action.sa_flags = 0;
         if (sigaction(SIGINT,&action,NULL) == -1) {
             return EXIT_FAILURE;
         }
@@ -29,7 +36,7 @@ int simpledu_handler(){
 }
 
 void sigint_handler(int signo){
-    printf("PID/PGID: %d/%d\t", getpid(), getpgrp());
+    //printf("PID/PGID/arg: %d/%d/%d\t", getpid(), getpgrp(), arg.children_process_group);
     char input[PATH_MAX];
     pid_t pgid = arg.children_process_group;
     if (pgid == 0) {
@@ -41,7 +48,7 @@ void sigint_handler(int signo){
         killpg(pgid, SIGSTOP);
         
             printf("Are you sure you want to terminate the program? (y/n)\n");
-            scanf("%c", input);
+            if (scanf("%c", input) != 1) return;
             if (*input == 'n' || *input == 'N'){
                 killpg(pgid, SIGCONT);
             } else /*if (*input == 'y' || *input == 'Y')*/{

@@ -61,8 +61,8 @@ test/compare_simpledu_du.sh "./simpledu" "-l include b acutest a test"
 
 # Testes grandes
 test/compare_simpledu_du.sh "./simpledu" "-l .."
-test/compare_simpledu_du.sh "./simpledu" "-l ../.."
-test/compare_simpledu_du.sh "./simpledu" "-l ../../.."
+# test/compare_simpledu_du.sh "./simpledu" "-l ../.."
+#test/compare_simpledu_du.sh "./simpledu" "-l ../../.."
 test/compare_simpledu_du.sh "./simpledu" "-l /home"
 
 # Testes de outros sítios

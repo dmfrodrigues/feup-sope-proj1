@@ -14,13 +14,16 @@
 #define FILEDES_INVALID -1
 
 simpledu_envp_t env;
+simpledu_args_t arg;
 
 int simpledu_init(int argc, char *argv[], char *envp[]){
     //Arguments and environment
     if(simpledu_args_ctor(&arg, argc, argv) ||
        simpledu_envp_ctor(&env, envp)) return EXIT_FAILURE;
 
-    //
+    // char temp[999];
+    // sprintf(temp, "PGID ARG->%d\n", arg.children_process_group);
+    // write(1, temp, strlen(temp));
     return EXIT_SUCCESS;
 }
 
@@ -30,11 +33,8 @@ void simpledu_clean(){
 }
 
 int main(int argc, char *argv[], char *envp[]){
-    //INITIALIZE HANDLER
-    if (simpledu_handler()){
-        return EXIT_FAILURE;
-    }
-
+    if (simpledu_handler()) return EXIT_FAILURE;
+    
     if(simpledu_init(argc, argv, envp)) simpledu_exit(EXIT_FAILURE);
     if(atexit(simpledu_clean)) simpledu_exit(EXIT_FAILURE);
 
@@ -89,6 +89,6 @@ int main(int argc, char *argv[], char *envp[]){
     if(arg.pipe_filedes != -1){
         close(arg.pipe_filedes);
     }
-
+    //printf("\t%d/%d\n", getpid(), getpgrp());
     simpledu_exit(ret);
 }

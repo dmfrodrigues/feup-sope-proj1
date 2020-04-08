@@ -7,6 +7,7 @@
 #include <errno.h>
 
 #include "simpledu_stat.h"
+#include "simpledu_args.h"
 
 static const char PARENT_DIR[] = "..";
 static const char THIS_DIR[] = ".";
@@ -81,7 +82,7 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                                 arg.children_process_group = pid;
                             }
                         } else if (pid == 0) {  // child
-                            if(arg.children_process_group == 0){ //This check must be done twice
+                            if(arg.children_process_group == 0){
                                 arg.children_process_group = getpid();
                                 setpgid(0, getpid());
                             }
@@ -191,7 +192,7 @@ int simpledu_retrieve(int pipe_filedes, off_t *size) {
             *size += more_size;
         }
     }
-    if(errno != ECHILD) return EXIT_FAILURE;
+    if(errno != ECHILD ) return errno;
     return ret;
 }
 
