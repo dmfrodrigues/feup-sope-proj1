@@ -10,7 +10,7 @@ ODIR   =./obj
 TDIR   =./test
 TEXE   =test
 
-CFLAGS =-Wall -O0 -g $(IFLAGS)
+CFLAGS =-Wall -O3 -g $(IFLAGS)
 
 all: makefolders $(PROG)
 
@@ -23,7 +23,7 @@ test: all
 	$(CC) $(CFLAGS) -c -I./acutest/include $(TDIR)/tests.c -o $(ODIR)/tests.o
 	$(CC) $(ODIR)/tests.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_envp.o $(ODIR)/simpledu_stat.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o $(ODIR)/simpledu_iterate.o -o $(ODIR)/$(TEXE)
 	$(ODIR)/$(TEXE)
-	chmod u+x $(TDIR)/test_compare_du.sh $(TDIR)/compare_du.sh
+	chmod u+x $(TDIR)/*.sh
 	$(TDIR)/test_compare_du.sh
 
 testmem:

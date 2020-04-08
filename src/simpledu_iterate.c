@@ -5,60 +5,111 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <libgen.h>
+#include <stdlib.h>
 
 #include "simpledu_stat.h"
 
 static const char PARENT_DIR[] = "..";
 static const char THIS_DIR[] = ".";
 
-int simpledu_get_program_path(char *path) {
-    if (getcwd(path, PATH_MAX) == NULL) return EXIT_FAILURE;
-    strcat(path, "/simpledu");
+int simpledu_join_path(char *dest, const char *src){
+    size_t N = strlen(dest);
+    if(dest[N-1] != '/') strcat(dest, "/");
+    strcat(dest, src);
     return EXIT_SUCCESS;
 }
 
-int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *size, simpledu_args_t arg, char *envp[]) {
+int simpledu_get_program_path(char *path, size_t n) {
+    if(readlink("/proc/self/exe", path, n) == -1) return EXIT_FAILURE;
+    return EXIT_SUCCESS;
+}
+
+
+int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_t arg, char *envp[]) {
+    int ret = EXIT_SUCCESS;
     // Size
     *size = 0;
+
     // Pipe
     int filedes[2];
     if(pipe(filedes)) return EXIT_FAILURE;
     *pipe_id = filedes[0];
-    *reads_pipe = 0;
+
     // Get path
     char simpledu_path[PATH_MAX];
-    if (simpledu_get_program_path(simpledu_path)) return EXIT_FAILURE;
+    if (simpledu_get_program_path(simpledu_path, PATH_MAX-1)) return EXIT_FAILURE;
+
     // Mode
     simpledu_mode_t mode;
-    if (simpledu_mode(path, &mode)){
-        fprintf(stderr, "du: cannot access '%s': No such file or directory\n", path);
-        return EXIT_FAILURE;
+    char resolved_path[PATH_MAX];
+    if (arg.dereference) {
+        if (realpath(path, resolved_path) == NULL){
+            fprintf(stderr, "du: cannot access '%s': No such file or directory\n", path);
+            return 2;
+        }
+        simpledu_mode(resolved_path, &mode);
     }
+    else if (simpledu_mode(path, &mode)){
+
+        fprintf(stderr, "du: cannot access '%s': No such file or directory\n", path);
+        return 2;
+    }
+    off_t folder_size;
+    if (arg.dereference) {
+        folder_size = simpledu_stat(resolved_path, arg.apparent_size);
+    }
+    else {
+        folder_size = simpledu_stat(path, arg.apparent_size);
+    }
+    if(folder_size == -1) return EXIT_FAILURE;
+    *size += folder_size;
     switch (mode) {
         case simpledu_mode_dir:{
             DIR *dir_to_iter = opendir(path);
-            if (dir_to_iter == NULL) return EXIT_FAILURE;
+            if (dir_to_iter == NULL){
+                switch(errno){
+                    case EACCES:
+                        fprintf(stderr, "du: cannot read directory '%s': Permission denied\n", path);
+                        close(filedes[0]);
+                        close(filedes[1]);
+                        return EXIT_FAILURE;
+                    default:
+                        break;
+                }
+                close(filedes[0]);
+                close(filedes[1]);
+                return 2;
+            }
             // Iterating over the items of a directory
             struct dirent *dir_point = NULL;
             while ((dir_point = readdir(dir_to_iter)) != NULL) {
+                // simpledu_process(simpledu_path, filedes, dir_point, path, size, arg, envp);
+                
                 if (strcmp(dir_point->d_name, PARENT_DIR) == 0 ||
                     strcmp(dir_point->d_name, THIS_DIR  ) == 0)
                     continue;
                 //New path
-                char new_path[PATH_MAX];
-                strcat(strcat(strcpy(new_path, path), "/"), dir_point->d_name);
+                char new_path[PATH_MAX]; strcpy(new_path, path);
+                if(simpledu_join_path(new_path, dir_point->d_name)) return EXIT_FAILURE;
                 // New mode
                 simpledu_mode_t new_mode;
-                if (simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;
+                char resolved_path_2[PATH_MAX];
+                if (arg.dereference) {
+                    if (realpath(new_path, resolved_path_2) == NULL){
+                        fprintf(stderr, "du: cannot access '%s'\n", new_path);
+                        ret = EXIT_FAILURE;
+                        continue;
+                    }
+                    simpledu_mode(resolved_path_2, &new_mode);
+                }
+                else if (simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;
                 switch(new_mode){
                     case simpledu_mode_dir: {
-                        ++(*reads_pipe);
                         int pid = fork();
-                        int status;
 
                         if (pid > 0) {  // parent
-                            waitpid(-1, &status, 0);
-                            if(status) return EXIT_FAILURE;
+
                         } else if (pid == 0) {  // child
                             --arg.max_depth;
                             close(filedes[0]);
@@ -75,38 +126,41 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
                         }
                     } break;
                     case simpledu_mode_lnk: {
+
                         if (arg.dereference) {
-                            char symb_link_buf[PATH_MAX];
-                            ssize_t len = readlink(dir_point->d_name, symb_link_buf,
-                                                sizeof(symb_link_buf) - 1);
 
-                            // if no error occured
-                            if (len != -1) symb_link_buf[len] = '\0';
+                            char resolved_path[PATH_MAX];
+                            if (realpath(new_path, resolved_path) == NULL) return EXIT_FAILURE;
 
-                            // symb_link_buf -> Path of symb link relative to the
-                            // directory. Examples:
-                            //      ../testing_2/testing_symb_link_2_pls_work.txt
-                            //      ./testtt/to_symb_link.txt
+                            int pid = fork();
 
-                            off_t symb_link_file_size = simpledu_stat(symb_link_buf, arg.apparent_size);
-                            if (symb_link_file_size == -1) return EXIT_FAILURE;
+                            if (pid > 0) {  // parent
 
-                            *size += symb_link_file_size;
-                            // If it needs to display file size
-                            if (arg.max_depth > 0 && arg.all) {
-                                printf("%ld\t%s\n", simpledu_block(symb_link_file_size, arg.block_size),
-                                    symb_link_buf);
+                            } else if (pid == 0) {  // child
+                                --arg.max_depth;
+                                close(filedes[0]);
+                                arg.pipe_filedes = filedes[1];
+
+                                if (simpledu_args_set_files(&arg, 1, new_path))
+                                    return EXIT_FAILURE;
+
+                                char **new_argv = NULL;
+                                if (simpledu_args_toargv(&arg, &new_argv))
+                                    return EXIT_FAILURE;
+                                if (execve(simpledu_path, new_argv, envp))
+                                    return EXIT_FAILURE;
                             }
-                        } else {  // -L was not passed as argument. Process as if it
-                                // was a regular file.
-                            // display size and relative path/(name)
+
+                        } else {  // -L was not passed as argument
+
                             off_t file_size = simpledu_stat(new_path, arg.apparent_size);
                             if (file_size == -1) return EXIT_FAILURE;
-                            *size += file_size;
+                            
                             // If it needs to display file size
                             if (arg.max_depth > 0 && arg.all) {
                                 printf("%ld\t%s\n", simpledu_block(file_size, arg.block_size), new_path);
                             }
+                            *size += file_size;
                         }
                     } break;
                     case simpledu_mode_reg: {
@@ -118,10 +172,9 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
                     } break;
                     default: break;
                 }
-            }
+                
+            } 
 
-            // After iterating over directory, will try to display results
-            *size += simpledu_stat(path, arg.apparent_size);
             closedir(dir_to_iter);
 
             break;
@@ -131,7 +184,7 @@ int simpledu_iterate(const char *path, int *pipe_id, size_t *reads_pipe, off_t *
 
     close(filedes[1]);
 
-    return EXIT_SUCCESS;
+    return ret;
 }
 
 int readline(int fd, char *str) {
@@ -147,17 +200,18 @@ int readline(int fd, char *str) {
     return EXIT_SUCCESS;
 }
 
-int simpledu_retrieve(int pipe_filedes, size_t reads_pipe, off_t *size) {
+int simpledu_retrieve(int pipe_filedes, off_t *size) {
+    int ret = EXIT_SUCCESS;
     *size = 0;
     if(pipe_filedes == -1) return EXIT_SUCCESS;
     //Repeat until an error exit code is returned
     char line[PIPE_BUF];
-    /*
-    int r, ret;
-    while((r = waitpid(-1, &ret, 0)) >= 0){
+    
+    int r, status;
+    while((r = waitpid(-1, &status, 0)) >= 0){
         //If a child has returned
         if(r > 0){
-            if(ret) return EXIT_FAILURE;
+            if(status) ret = 2;
             if(readline(pipe_filedes, line)) return EXIT_FAILURE;
             off_t more_size;
             if(sscanf(line, "%ld", &more_size)!=1) return EXIT_FAILURE;
@@ -165,14 +219,7 @@ int simpledu_retrieve(int pipe_filedes, size_t reads_pipe, off_t *size) {
         }
     }
     if(errno != ECHILD) return EXIT_FAILURE;
-     */
-    for(size_t i = 0; i < reads_pipe; ++i){
-        if(readline(pipe_filedes, line)) return EXIT_FAILURE;
-        off_t more_size;
-        if(sscanf(line, "%ld", &more_size)!=1) return EXIT_FAILURE;
-        *size += more_size;
-    }
-    return EXIT_SUCCESS;
+    return ret;
 }
 
 int simpledu_print(const char *path, off_t size, off_t more_size, simpledu_args_t arg) {
@@ -183,7 +230,7 @@ int simpledu_print(const char *path, off_t size, off_t more_size, simpledu_args_
     if(arg.pipe_filedes != -1){
         char buf[PIPE_BUF];
         sprintf(buf, "%ld\n", size+more_size);
-        write(arg.pipe_filedes, buf, strlen(buf));
+        if(write(arg.pipe_filedes, buf, strlen(buf)) != strlen(buf)) return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }

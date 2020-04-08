@@ -62,14 +62,22 @@ int main(int argc, char *argv[], char *envp[]){
     // Create log
     if(simpledu_log_CREATE(argc, (const char * const*)argv)) simpledu_exit(EXIT_FAILURE);
 
-    int ret = EXIT_SUCCESS;
+    int r, ret = EXIT_SUCCESS;
 
     for(size_t i = 0; i < arg.filesc; ++i){
-        int pipe_id; size_t num_reads_from_pipe;
+        int pipe_id;
         off_t size, more_size;
 
-        if(simpledu_iterate(arg.files[i], &pipe_id, &num_reads_from_pipe, &size, arg, envp)){ ret = EXIT_FAILURE; continue; }
-        if(simpledu_retrieve(pipe_id, num_reads_from_pipe, &more_size)) simpledu_exit(EXIT_FAILURE);
+        if((r = simpledu_iterate(arg.files[i], &pipe_id, &size, arg, envp))){
+            ret = EXIT_FAILURE;
+            //From now on, when simpledu_iterate returns 2, 
+            if(r == 2) continue;
+        }
+        if((r = simpledu_retrieve(pipe_id, &more_size))){
+            ret = EXIT_FAILURE;
+            if(r == 2) {}
+            else continue;
+        }
         if(simpledu_print(arg.files[i], size, more_size, arg)) simpledu_exit(EXIT_FAILURE);
     }
 
