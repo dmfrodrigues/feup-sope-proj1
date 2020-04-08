@@ -15,7 +15,7 @@ CFLAGS_PARANOID =-Wall -Wextra -Wformat-nonliteral -Wcast-align -Wpointer-arith 
 -Wnested-externs -Wcast-qual -Wshadow -Wwrite-strings -Wno-unused-parameter \
 -Wfloat-equal -pedantic -Wno-long-long -Wno-endif-labels -g $(IFLAGS)
 
-CFLAGS =-Wall -O3 -g $(IFLAGS)
+CFLAGS =-Wall -g $(IFLAGS) #-O3
 
 all: makefolders $(PROG)
 

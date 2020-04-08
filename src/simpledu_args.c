@@ -40,12 +40,15 @@ static const struct option longopts[] = {
 };
 
 int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
+    int ret = EXIT_SUCCESS;
+
     if(p == NULL){ errno = EINVAL; return EXIT_FAILURE; }
     *p = simpledu_args_default;
 
     if(argc == 0 || argv == NULL) return EXIT_SUCCESS;
 
-    opterr = 0; optind = 1;
+    opterr = 0;
+    optind = 1;
     int opt = 0; int longindex;
     while((opt = getopt_long(argc, argv, optstring, longopts, &longindex)) != -1){
         switch(opt){
@@ -65,7 +68,12 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
                     apparent_size = false;
                 }
                 break;
-            default: opterr = 1; optind = 1; return EXIT_FAILURE;
+            case '?':
+                fprintf(stderr, "du: invalid option -- '%c'\n", optopt);
+                ret = EXIT_FAILURE;
+                break;
+            default:
+                opterr = 1; optind = 1; return EXIT_FAILURE;
         }
     }
     opterr = 1;
@@ -99,7 +107,9 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
         strcpy(str, s);
         p->files[0] = str;
     }
-    return EXIT_SUCCESS;
+
+    if(ret) fprintf(stderr, "Try 'du --help' for more information.\n");
+    return ret;
 }
 
 int simpledu_args_dtor(simpledu_args_t *p){

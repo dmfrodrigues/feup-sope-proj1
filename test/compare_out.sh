@@ -11,10 +11,11 @@ NC_INTENSIVE='\033[1m' # No Color
 NC='\033[0m' # No Color
 
 SIMPLEDU_OUT="$1"
-ARGS="$2"
+simpledu_exit="$2"
+ARGS="$3"
 DU_OUT=/tmp/du.out
 
-du $ARGS | sort -k2 > $DU_OUT
+du $ARGS 2> /dev/null | sort -k2 > $DU_OUT
 
 EXIT_STATUS=0
 diff -q $SIMPLEDU_OUT $DU_OUT > /dev/null 2>&1 || EXIT_STATUS=$?

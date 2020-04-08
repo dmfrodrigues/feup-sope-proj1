@@ -32,6 +32,18 @@ make test
 make clean
 ```
 
+### Create ZIP file
+
+```sh
+make zip
+```
+
+### Test ZIP file contents
+
+```sh
+make testzip
+```
+
 ## Run me
 
 ```sh

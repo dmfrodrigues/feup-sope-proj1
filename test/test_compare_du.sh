@@ -64,6 +64,14 @@ test/compare_simpledu_du.sh "./simpledu" "-l include acutest a"
 test/compare_simpledu_du.sh "./simpledu" "-l a b"
 test/compare_simpledu_du.sh "./simpledu" "-l b a"
 test/compare_simpledu_du.sh "./simpledu" "-l include b acutest a test"
+test/compare_simpledu_du.sh "./simpledu" "-e"
+test/compare_simpledu_du.sh "./simpledu" "-eij"
+test/compare_simpledu_du.sh "./simpledu" "-jie"
+test/compare_simpledu_du_out.sh "./simpledu" "--eij"
+test/compare_simpledu_du_out.sh "./simpledu" "--jie"
+test/compare_simpledu_du.sh "./simpledu" "include -e"
+test/compare_simpledu_du.sh "./simpledu" "-eij ."
+test/compare_simpledu_du.sh "./simpledu" "-jie a"
 
 # Testes de outros sítios
 curr_dir=${PWD##*/}
