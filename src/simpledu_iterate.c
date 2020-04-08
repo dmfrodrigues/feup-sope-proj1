@@ -89,7 +89,12 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                 if(simpledu_join_path(new_path, dir_point->d_name)) return EXIT_FAILURE;
                 // New mode
                 simpledu_mode_t new_mode;
-                if (simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;
+                char resolved_path_2[PATH_MAX];
+                if (arg.dereference) {
+                    if (realpath(new_path, resolved_path_2) == NULL) return EXIT_FAILURE;
+                    simpledu_mode(resolved_path_2, &new_mode);
+                }
+                else if (simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;
                 switch(new_mode){
                     case simpledu_mode_dir: {
                         int pid = fork();
