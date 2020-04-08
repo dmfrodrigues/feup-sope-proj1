@@ -27,9 +27,3 @@ int simpledu_mode(const char *path, simpledu_mode_t *m){
     else                          *m = simpledu_mode_non;
     return EXIT_SUCCESS;
 }
-
-off_t simpledu_file_size(const char *path) {
-    struct stat buf;
-    if(lstat(path, &buf)) return -1;
-    return buf.st_size;
-}
