@@ -120,11 +120,25 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
     if (simpledu_get_program_path(simpledu_path, PATH_MAX-1)) return EXIT_FAILURE;
     // Mode
     simpledu_mode_t mode;
-    if (simpledu_mode(path, &mode)){
+    char resolved_path[PATH_MAX];
+    if (arg.dereference) {
+        if (realpath(path, resolved_path) == NULL) return EXIT_FAILURE;
+        simpledu_mode(resolved_path, &mode);
+        // printf("resolved path: %s\n", resolved_path);
+        // printf("mode: %d\n", mode);
+    }
+    else if (simpledu_mode(path, &mode)){
+
         fprintf(stderr, "du: cannot access '%s': No such file or directory\n", path);
         return EXIT_FAILURE;
     }
-    off_t folder_size = simpledu_stat(path, arg.apparent_size);
+    off_t folder_size;
+    if (arg.dereference) {
+        folder_size = simpledu_stat(resolved_path, arg.apparent_size);
+    }
+    else {
+        folder_size = simpledu_stat(path, arg.apparent_size);
+    }
     if(folder_size == -1) return EXIT_FAILURE;
     *size += folder_size;
     switch (mode) {
@@ -196,7 +210,7 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                                 close(filedes[0]);
                                 arg.pipe_filedes = filedes[1];
 
-                                if (simpledu_args_set_files(&arg, 1, resolved_path))
+                                if (simpledu_args_set_files(&arg, 1, new_path))
                                     return EXIT_FAILURE;
 
                                 char **new_argv = NULL;
