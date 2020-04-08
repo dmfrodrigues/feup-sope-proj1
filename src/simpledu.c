@@ -70,13 +70,13 @@ int main(int argc, char *argv[], char *envp[]){
 
         if((r = simpledu_iterate(arg.files[i], &pipe_id, &size, arg, envp))){
             ret = EXIT_FAILURE;
-            //From now on, when simpledu_iterate returns 2, 
+            //From now on, when simpledu_iterate returns 2, die
             if(r == 2) continue;
         }
         if((r = simpledu_retrieve(pipe_id, &more_size))){
             ret = EXIT_FAILURE;
-            if(r == 2) {}
-            else continue;
+            //From now on, when simpledu_retrieve returns 2, die
+            if(r == 2) continue;
         }
         if(simpledu_print(arg.files[i], size, more_size, arg)) simpledu_exit(EXIT_FAILURE);
     }
