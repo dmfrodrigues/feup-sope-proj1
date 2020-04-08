@@ -7,7 +7,7 @@ test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -b -S"
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -b -S --max-depth=2"
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -B 1"
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -a"
-# test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -a -L"
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -a -L"
 
 # Testes ''
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder"
@@ -62,8 +62,8 @@ test/compare_simpledu_du.sh "./simpledu" "-l include b acutest a test"
 # Testes grandes
 test/compare_simpledu_du.sh "./simpledu" "-l .."
 test/compare_simpledu_du.sh "./simpledu" "-l ../.."
-# test/compare_simpledu_du.sh "./simpledu" "-l ../../.."
-# test/compare_simpledu_du.sh "./simpledu" "-l /home"
+test/compare_simpledu_du.sh "./simpledu" "-l ../../.."
+test/compare_simpledu_du.sh "./simpledu" "-l /home"
 
 # Testes de outros sítios
 cd ..
