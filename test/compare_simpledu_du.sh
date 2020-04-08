@@ -21,5 +21,8 @@ simpledu_exit="${PIPESTATUS[0]}"
 
 mypath=$(dirname $0)
 $mypath/compare_outerr.sh $SIMPLEDU_OUT $SIMPLEDU_ERR $simpledu_exit "$2"
+exit_status=$?
 
 rm $SIMPLEDU_OUT $SIMPLEDU_ERR
+
+exit $exit_status

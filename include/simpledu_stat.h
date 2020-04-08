@@ -45,3 +45,5 @@ int simpledu_mode(const char *path, simpledu_mode_t *m);
 off_t simpledu_file_size(const char *path);
 
 #endif //SIMPLEDU_STAT_H_INCLUDED
+
+

@@ -7,7 +7,7 @@ test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -b -S"
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -b -S --max-depth=2"
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -B 1"
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -a"
-# test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -a -L"
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -a -L"
 
 # Testes ''
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder"
@@ -40,6 +40,12 @@ test/compare_simpledu_du.sh "./simpledu" "-l -S -B 10 ."
 test/compare_simpledu_du.sh "./simpledu" "-l -S -B 10 include"
 test/compare_simpledu_du.sh "./simpledu" "-l -S -B 10 acutest"
 
+# Testes '-L'
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D2 -a -L"
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx -a -L"
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -a -L"
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/symlnk -a -L"
+
 # Testes com vários
 test/compare_simpledu_du.sh "./simpledu" "-l -S -B 10 acutest include test"
 
@@ -59,12 +65,6 @@ test/compare_simpledu_du.sh "./simpledu" "-l a b"
 test/compare_simpledu_du.sh "./simpledu" "-l b a"
 test/compare_simpledu_du.sh "./simpledu" "-l include b acutest a test"
 
-# Testes grandes
-test/compare_simpledu_du.sh "./simpledu" "-l .."
-# test/compare_simpledu_du.sh "./simpledu" "-l ../.."
-#test/compare_simpledu_du.sh "./simpledu" "-l ../../.."
-test/compare_simpledu_du.sh "./simpledu" "-l /home"
-
 # Testes de outros sítios
 cd ..
 feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a test/test-folder/"
@@ -72,3 +72,15 @@ feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a ./
 feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a include/"
 feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a acutest/"
 cd feup-sope-proj1
+
+# Testes para ficheiros e para symlinks que apontam para ficheiros
+test/compare_simpledu_du.sh "./simpledu" "-l include/simpledu_args.h"
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/F3bin -a"
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/F3bin -a -L"
+
+# Testes grandes
+test/compare_simpledu_du.sh "./simpledu" "-l .."
+test/compare_simpledu_du.sh "./simpledu" "-l ../../.docker"
+test/compare_simpledu_du.sh "./simpledu" "-l ../.."
+test/compare_simpledu_du.sh "./simpledu" "-l ../../.."
+test/compare_simpledu_du.sh "./simpledu" "-l /home"

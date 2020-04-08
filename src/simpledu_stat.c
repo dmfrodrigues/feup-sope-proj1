@@ -9,6 +9,7 @@ static const off_t stat_std_block_size = 512;
 
 off_t simpledu_stat(const char *path, bool apparent_size){
     struct stat buf;
+
     if(lstat(path, &buf)) return -1;
     return (apparent_size ? buf.st_size : buf.st_blocks*stat_std_block_size);
 }
@@ -32,4 +33,3 @@ off_t simpledu_file_size(const char *path) {
     if(lstat(path, &buf)) return -1;
     return buf.st_size;
 }
-
