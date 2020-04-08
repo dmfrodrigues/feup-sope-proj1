@@ -1,6 +1,10 @@
 #ifndef SIMPLEDU_SIGNALS_H_INCLUDED
 #define SIMPLEDU_SIGNALS_H_INCLUDED
 
+#include <unistd.h>
+
+void initialize_data(pid_t p);
+
 /**
  * @brief Handles installing of signal handler and flags
  * 

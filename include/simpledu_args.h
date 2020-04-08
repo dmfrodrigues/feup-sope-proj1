@@ -133,6 +133,4 @@ int simpledu_args_set_files(simpledu_args_t *p, int num,...);
  */
 int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv);
 
-simpledu_args_t arg;
-
 #endif //SIMPLEDU_ARGS_H_INCLUDED

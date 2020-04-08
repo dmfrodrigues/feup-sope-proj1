@@ -8,6 +8,7 @@
 
 #include "simpledu_stat.h"
 #include "simpledu_args.h"
+#include "simpledu_signals.h"
 
 static const char PARENT_DIR[] = "..";
 static const char THIS_DIR[] = ".";
@@ -80,6 +81,11 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                         if (pid > 0) {  // parent
                             if(arg.children_process_group == 0){ //This is the first child of second process group
                                 arg.children_process_group = pid;
+
+                                initialize_data(arg.children_process_group);
+
+                                char x[999]; sprintf(x, "TA AQUI %d/%d\n", getpid() ,arg.children_process_group); write(1, x, strlen(x));
+
                             }
                         } else if (pid == 0) {  // child
                             if(arg.children_process_group == 0){

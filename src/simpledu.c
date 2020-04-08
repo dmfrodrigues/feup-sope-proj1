@@ -11,10 +11,11 @@
 #include "simpledu_iterate.h"
 #include "simpledu_signals.h"
 
+#include "arg.h"
+
 #define FILEDES_INVALID -1
 
 simpledu_envp_t env;
-simpledu_args_t arg;
 
 int simpledu_init(int argc, char *argv[], char *envp[]){
     //Arguments and environment
@@ -33,10 +34,11 @@ void simpledu_clean(){
 }
 
 int main(int argc, char *argv[], char *envp[]){
-    if (simpledu_handler()) return EXIT_FAILURE;
-    
     if(simpledu_init(argc, argv, envp)) simpledu_exit(EXIT_FAILURE);
     if(atexit(simpledu_clean)) simpledu_exit(EXIT_FAILURE);
+
+    initialize_data(arg.children_process_group);
+    if (simpledu_handler()) return EXIT_FAILURE;
 
     //Time
     if(arg.start_time == -1){

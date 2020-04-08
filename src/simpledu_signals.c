@@ -2,20 +2,25 @@
 #include "simpledu_signals.h"
 
 #include "simpledu_args.h"
+#include "arg.h"
 
 #include <stdio.h> 
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
 
+static pid_t children_group;
+void initialize_data(pid_t p){
+    children_group = p;
+}
 
 int simpledu_handler(){
     struct sigaction action;
     sigset_t sigmask;
     pid_t pgid = arg.children_process_group;
-    char temp[999];
-    sprintf(temp, "HANDLER INST %d/%d\n", getpgrp(), pgid);
-    write(1, temp, strlen(temp));
+    // char temp[999];
+    // sprintf(temp, "HANDLER INST %d/%d\n", getpgrp(), pgid);
+    // write(1, temp, strlen(temp));
     if (pgid == 0) { //First process, will handle second group
         action.sa_handler = sigint_handler;
         sigemptyset(&action.sa_mask);
@@ -36,9 +41,13 @@ int simpledu_handler(){
 }
 
 void sigint_handler(int signo){
-    //printf("PID/PGID/arg: %d/%d/%d\t", getpid(), getpgrp(), arg.children_process_group);
+    pid_t pgid = children_group;
+
+    char x[999];
+    sprintf(x, "IN HANDLER -> %d/%d\t", getpgrp(), pgid);
+    write(1, x, strlen(x));
+
     char input[PATH_MAX];
-    pid_t pgid = arg.children_process_group;
     if (pgid == 0) {
         return;
     }
