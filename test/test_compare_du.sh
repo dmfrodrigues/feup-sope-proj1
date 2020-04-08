@@ -45,7 +45,6 @@ test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D2 -a -L"
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx -a -L"
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -a -L"
 test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/symlnk -a -L"
-# test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/F3bin -a -L"
 
 # Testes com vários
 test/compare_simpledu_du.sh "./simpledu" "-l -S -B 10 acutest include test"
@@ -73,6 +72,11 @@ feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a ./
 feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a include/"
 feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a acutest/"
 cd feup-sope-proj1
+
+# Testes para ficheiros e para symlinks que apontam para ficheiros
+test/compare_simpledu_du.sh "./simpledu" "-l include/simpledu_args.h"
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/F3bin -a"
+test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/F3bin -a -L"
 
 # Testes grandes
 test/compare_simpledu_du.sh "./simpledu" "-l .."

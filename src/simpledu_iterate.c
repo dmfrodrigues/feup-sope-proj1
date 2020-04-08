@@ -51,7 +51,6 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
         simpledu_mode(resolved_path, &mode);
     }
     else if (simpledu_mode(path, &mode)){
-
         fprintf(stderr, "du: cannot access '%s': No such file or directory\n", path);
         return 2;
     }
@@ -177,8 +176,11 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
 
             closedir(dir_to_iter);
 
-            break;
-        }
+        } break;
+        case simpledu_mode_reg:{
+        } break;
+        case simpledu_mode_lnk:{
+        } break;
         default: return EXIT_FAILURE;
     }
 
