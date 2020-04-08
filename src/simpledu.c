@@ -24,7 +24,7 @@ int simpledu_init(int argc, char *argv[], char *envp[]){
     return EXIT_SUCCESS;
 }
 
-void simpledu_clean(){
+void simpledu_clean(void){
     simpledu_envp_dtor(&env);
     simpledu_args_dtor(&arg);
 }

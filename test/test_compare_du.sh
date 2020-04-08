@@ -66,12 +66,13 @@ test/compare_simpledu_du.sh "./simpledu" "-l b a"
 test/compare_simpledu_du.sh "./simpledu" "-l include b acutest a test"
 
 # Testes de outros sítios
+curr_dir=${PWD##*/}
 cd ..
-feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a test/test-folder/"
-feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a ./"
-feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a include/"
-feup-sope-proj1/test/compare_simpledu_du.sh "feup-sope-proj1/simpledu" "-l -a acutest/"
-cd feup-sope-proj1
+$curr_dir/test/compare_simpledu_du.sh "$curr_dir/simpledu" "-l -a $curr_dir/test/test-folder/"
+$curr_dir/test/compare_simpledu_du.sh "$curr_dir/simpledu" "-l -a $curr_dir/"
+$curr_dir/test/compare_simpledu_du.sh "$curr_dir/simpledu" "-l -a $curr_dir/include/"
+$curr_dir/test/compare_simpledu_du.sh "$curr_dir/simpledu" "-l -a $curr_dir/acutest/"
+cd $curr_dir
 
 # Testes para ficheiros e para symlinks que apontam para ficheiros
 test/compare_simpledu_du.sh "./simpledu" "-l include/simpledu_args.h"

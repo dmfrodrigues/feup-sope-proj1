@@ -14,7 +14,7 @@ SIMPLEDU_OUT=/tmp/simpledu.out
 SIMPLEDU_ERR=/tmp/simpledu.err
 
 s="${NC_INTENSIVE}Test '$1' with args '$2'...${NC}"
-printf %-88b "$s"
+printf %-96b "$s"
 
 $1 $2 2> $SIMPLEDU_ERR | sort -k2 > $SIMPLEDU_OUT
 simpledu_exit="${PIPESTATUS[0]}"

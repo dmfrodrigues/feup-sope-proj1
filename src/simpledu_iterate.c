@@ -197,7 +197,7 @@ int simpledu_print(const char *path, off_t size, off_t more_size, simpledu_args_
     if(arg.pipe_filedes != -1){
         char buf[PIPE_BUF];
         sprintf(buf, "%ld\n", size+more_size);
-        if(write(arg.pipe_filedes, buf, strlen(buf)) != strlen(buf)) return EXIT_FAILURE;
+        if(write(arg.pipe_filedes, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
