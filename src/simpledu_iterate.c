@@ -44,13 +44,16 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
     simpledu_mode_t mode;
     char resolved_path[PATH_MAX];
     if (arg.dereference) {
-        if (realpath(path, resolved_path) == NULL) return EXIT_FAILURE;
+        if (realpath(path, resolved_path) == NULL){
+            fprintf(stderr, "du: cannot access '%s': No such file or directory\n", path);
+            return 2;
+        }
         simpledu_mode(resolved_path, &mode);
     }
     else if (simpledu_mode(path, &mode)){
 
         fprintf(stderr, "du: cannot access '%s': No such file or directory\n", path);
-        return EXIT_FAILURE;
+        return 2;
     }
     off_t folder_size;
     if (arg.dereference) {
@@ -68,13 +71,15 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                 switch(errno){
                     case EACCES:
                         fprintf(stderr, "du: cannot read directory '%s': Permission denied\n", path);
-                        break;
+                        close(filedes[0]);
+                        close(filedes[1]);
+                        return EXIT_FAILURE;
                     default:
                         break;
                 }
                 close(filedes[0]);
                 close(filedes[1]);
-                return EXIT_FAILURE;
+                return 2;
             }
             // Iterating over the items of a directory
             struct dirent *dir_point = NULL;
@@ -91,7 +96,11 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                 simpledu_mode_t new_mode;
                 char resolved_path_2[PATH_MAX];
                 if (arg.dereference) {
-                    if (realpath(new_path, resolved_path_2) == NULL) return EXIT_FAILURE;
+                    if (realpath(new_path, resolved_path_2) == NULL){
+                        fprintf(stderr, "du: cannot access '%s'\n", new_path);
+                        ret = EXIT_FAILURE;
+                        continue;
+                    }
                     simpledu_mode(resolved_path_2, &new_mode);
                 }
                 else if (simpledu_mode(new_path, &new_mode)) return EXIT_FAILURE;

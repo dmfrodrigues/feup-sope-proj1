@@ -70,9 +70,8 @@ int main(int argc, char *argv[], char *envp[]){
 
         if((r = simpledu_iterate(arg.files[i], &pipe_id, &size, arg, envp))){
             ret = EXIT_FAILURE;
-            if     (errno == ENOENT) continue;
-            else if(errno == EACCES){ }
-            else continue;
+            //From now on, when simpledu_iterate returns 2, 
+            if(r == 2) continue;
         }
         if((r = simpledu_retrieve(pipe_id, &more_size))){
             ret = EXIT_FAILURE;
