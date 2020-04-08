@@ -40,6 +40,11 @@ test/compare_simpledu_du.sh "./simpledu" "-l -S -B 10 ."
 test/compare_simpledu_du.sh "./simpledu" "-l -S -B 10 include"
 test/compare_simpledu_du.sh "./simpledu" "-l -S -B 10 acutest"
 
+# Testes '-L'
+# test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder -a -L"
+# test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/symlnk -a -L"
+# test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/F3bin -a -L"
+
 # Testes com vários
 test/compare_simpledu_du.sh "./simpledu" "-l -S -B 10 acutest include test"
 
