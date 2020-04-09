@@ -42,6 +42,8 @@ static const struct option longopts[] = {
 int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
     int ret = EXIT_SUCCESS;
 
+    char buf[1024];
+
     if(p == NULL){ errno = EINVAL; return EXIT_FAILURE; }
     *p = simpledu_args_default;
 
@@ -69,7 +71,8 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
                 }
                 break;
             case '?':
-                fprintf(stderr, "du: invalid option -- '%c'\n", optopt);
+                sprintf(buf, "du: invalid option -- '%c'\n", optopt);
+                write(STDERR_FILENO, buf, strlen(buf));
                 ret = EXIT_FAILURE;
                 break;
             default:
@@ -108,7 +111,10 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
         p->files[0] = str;
     }
 
-    if(ret) fprintf(stderr, "Try 'du --help' for more information.\n");
+    if(ret){
+        strcpy(buf, "Try 'du --help' for more information.\n");
+        write(STDERR_FILENO, buf, strlen(buf));
+    }
     return ret;
 }
 
