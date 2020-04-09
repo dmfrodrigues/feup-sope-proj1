@@ -22,7 +22,7 @@ int simpledu_handler() {
     if (pgid == 0) {  // First process, will handle second group
         action.sa_handler = sigint_handler;
         sigemptyset(&action.sa_mask);
-        action.sa_flags = 0;
+        action.sa_flags = SA_RESTART;
         if (sigaction(SIGINT, &action, NULL) == -1) {
             return EXIT_FAILURE;
         }
@@ -40,10 +40,6 @@ int simpledu_handler() {
 
 void sigint_handler(int signo) {
     pid_t pgid = children_group;
-
-    char x[999];
-    sprintf(x, "IN HANDLER -> %d/%d\t", getpgrp(), pgid);
-    write(1, x, strlen(x));
 
     char input[PATH_MAX];
     if (pgid == 0) {

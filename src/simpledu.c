@@ -22,9 +22,6 @@ int simpledu_init(int argc, char *argv[], char *envp[]){
     if(simpledu_args_ctor(&arg, argc, argv) ||
        simpledu_envp_ctor(&env, envp)) return EXIT_FAILURE;
 
-    // char temp[999];
-    // sprintf(temp, "PGID ARG->%d\n", arg.children_process_group);
-    // write(1, temp, strlen(temp));
     return EXIT_SUCCESS;
 }
 
