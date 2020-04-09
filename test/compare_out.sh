@@ -15,7 +15,10 @@ simpledu_exit="$2"
 ARGS="$3"
 DU_OUT=/tmp/du.out
 
-du $ARGS 2> /dev/null | sort -k2 > $DU_OUT
+du $ARGS 2> /dev/null > $DU_OUT
+
+sort -k2 -o $SIMPLEDU_OUT $SIMPLEDU_OUT
+sort -k2 -o $DU_OUT $DU_OUT
 
 EXIT_STATUS=0
 diff -q $SIMPLEDU_OUT $DU_OUT > /dev/null 2>&1 || EXIT_STATUS=$?
