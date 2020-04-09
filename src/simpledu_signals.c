@@ -41,21 +41,23 @@ int simpledu_handler() {
 void sigint_handler(int signo) {
     pid_t pgid = children_group;
 
-    char input[PATH_MAX];
+    char input[PATH_MAX] = {0};
+    char output[PATH_MAX];
     if (pgid == 0) {
         return;
     }
 
     if (signo == SIGINT) {
-        printf("\tPGIDCHILD %d\n", pgid);
         killpg(pgid, SIGSTOP);
+        sprintf(output, "Are you sure you want to terminate the program? (y/n)\n");
+        write(STDOUT_FILENO, output, strlen(output));
 
-        printf("Are you sure you want to terminate the program? (y/n)\n");
-        if (scanf("%c", input) != 1) return;
+        read(STDIN_FILENO, input, 1);
         if (*input == 'n' || *input == 'N') {
             killpg(pgid, SIGCONT);
         } else /*if (*input == 'y' || *input == 'Y')*/ {
             killpg(pgid, SIGTERM);
+            killpg(0, SIGTERM);
         }
     }
 }
