@@ -20,7 +20,7 @@ $1 $2 2> $SIMPLEDU_ERR | sort -k2 > $SIMPLEDU_OUT
 simpledu_exit="${PIPESTATUS[0]}"
 
 mypath=$(dirname $0)
-$mypath/compare_outerr.sh $SIMPLEDU_OUT $SIMPLEDU_ERR $simpledu_exit "$2"
+$mypath/compare_out.sh $SIMPLEDU_OUT $simpledu_exit "$2"
 exit_status=$?
 
 rm $SIMPLEDU_OUT $SIMPLEDU_ERR

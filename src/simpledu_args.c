@@ -43,12 +43,15 @@ static const struct option longopts[] = {
 };
 
 int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
+    int ret = EXIT_SUCCESS;
+
     if(p == NULL){ errno = EINVAL; return EXIT_FAILURE; }
     *p = simpledu_args_default;
 
     if(argc == 0 || argv == NULL) return EXIT_SUCCESS;
 
-    opterr = 0; optind = 1;
+    opterr = 0;
+    optind = 1;
     int opt = 0; int longindex;
     while((opt = getopt_long(argc, argv, optstring, longopts, &longindex)) != -1){
         switch(opt){
@@ -58,7 +61,7 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
             case 'l': p->count_links   = true; break;
             case 'S': p->separate_dirs = true; break;
             case 'B': if(sscanf(optarg, "%llu" , &p->block_size  ) != 1) return EXIT_FAILURE; break;
-            case 'd': if(sscanf(optarg, "%hu"  , &p->max_depth   ) != 1) return EXIT_FAILURE; break;
+            case 'd': if(sscanf(optarg, "%hd"  , &p->max_depth   ) != 1) return EXIT_FAILURE; break;
             case 'f': if(sscanf(optarg, "%d"   , &p->log_filedes ) != 1) return EXIT_FAILURE; break;
             case 'p': if(sscanf(optarg, "%d"   , &p->pipe_filedes) != 1) return EXIT_FAILURE; break;
             case 's': if(sscanf(optarg, "%lldd", &p->start_time  ) != 1) return EXIT_FAILURE; break;
@@ -70,7 +73,12 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
                     if(sscanf(optarg, "%d" , &p->children_process_group) != 1) return EXIT_FAILURE;
                 }
                 break;
-            default: opterr = 1; optind = 1; return EXIT_FAILURE;
+            case '?':
+                fprintf(stderr, "du: invalid option -- '%c'\n", optopt);
+                ret = EXIT_FAILURE;
+                break;
+            default:
+                opterr = 1; optind = 1; return EXIT_FAILURE;
         }
     }
     opterr = 1;
@@ -79,11 +87,11 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
     if(p->filesc != 0) {
         p->files  = malloc(p->filesc*sizeof(char *));
         if(p->files == NULL) return EXIT_FAILURE;
-        for(int i = 0; i < p->filesc; ++i){
+        for(size_t i = 0; i < p->filesc; ++i){
             const char *s = argv[optind+i];
             char *str = malloc((1+strlen(s)*sizeof(char)));
             if(str == NULL){
-                for(int j = 0; j < i; ++j) free(p->files[i]);
+                for(size_t j = 0; j < i; ++j) free(p->files[i]);
                 free(p->files);
                 return EXIT_FAILURE;
             }
@@ -104,12 +112,14 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
         strcpy(str, s);
         p->files[0] = str;
     }
-    return EXIT_SUCCESS;
+
+    if(ret) fprintf(stderr, "Try 'du --help' for more information.\n");
+    return ret;
 }
 
 int simpledu_args_dtor(simpledu_args_t *p){
     if(p == NULL) return EXIT_SUCCESS;
-    for(int i = 0; i < p->filesc; ++i){
+    for(size_t i = 0; i < p->filesc; ++i){
         free(p->files[i]);
         p->files[i] = NULL;
     }
@@ -204,7 +214,7 @@ int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv){
     { sprintf(buf, "--start-time=%lld", p->start_time  ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //pipe_filedes
     { sprintf(buf, "--children-process-group=%d", p->children_process_group); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //pipe_filedes
     
-    for(int j = 0; j < p->filesc; ++i, ++j){
+    for(size_t j = 0; j < p->filesc; ++i, ++j){
         argv[i] = malloc((strlen(p->files[j])+1)*sizeof(char));
         strcpy(argv[i], p->files[j]);
     }

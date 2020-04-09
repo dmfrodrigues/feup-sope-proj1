@@ -36,14 +36,6 @@ typedef enum {
  */
 int simpledu_mode(const char *path, simpledu_mode_t *m);
 
-/**
- * @brief Gives the number of bytes of a file.
- * 
- * @param path      Path of file
- * @return int      File Size in bytes; -1 in case of error
- */
-off_t simpledu_file_size(const char *path);
-
 #endif //SIMPLEDU_STAT_H_INCLUDED
 
 
