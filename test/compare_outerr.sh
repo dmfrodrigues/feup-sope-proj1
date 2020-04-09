@@ -17,8 +17,14 @@ ARGS="$4"
 DU_OUT=/tmp/du.out
 DU_ERR=/tmp/du.err
 
-du $ARGS 2> $DU_ERR | sort -k2 > $DU_OUT
-du_exit="${PIPESTATUS[0]}" 
+du $ARGS 2> $DU_ERR > $DU_OUT
+du_exit="${PIPESTATUS[0]}"
+
+sort -k2 -o $SIMPLEDU_OUT $SIMPLEDU_OUT
+sort -k2 -o $SIMPLEDU_ERR $SIMPLEDU_ERR
+sort -k2 -o $DU_OUT $DU_OUT
+sort -k2 -o $DU_ERR $DU_ERR
+
 EXIT_STATUS=0
 diff -q $SIMPLEDU_OUT $DU_OUT > /dev/null 2>&1 || EXIT_STATUS=$?
 diff -q $SIMPLEDU_ERR $DU_ERR > /dev/null 2>&1 || EXIT_STATUS=$?
