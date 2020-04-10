@@ -97,8 +97,8 @@ void simpledu_exit(int status){
     exit(status);
 }
 
-int simpledu_kill(pid_t pid, int sig){
+int simpledu_killpg(pid_t pid, int sig){
     int res = simpledu_log_SEND_SIGNAL(sig, pid);
     if(res) return res;
-    return kill(pid, sig);
+    return killpg(pid, sig);
 }
