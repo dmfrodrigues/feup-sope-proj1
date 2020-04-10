@@ -11,6 +11,7 @@
 #include "simpledu_stat.h"
 #include "simpledu_args.h"
 #include "simpledu_signals.h"
+#include "simpledu_log.h"
 
 #define BUFFER_SIZE 1024+PATH_MAX
 
@@ -157,6 +158,7 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                         *size += file_size;
                         if (arg.max_depth > 0 && arg.all) {
                             sprintf(buf, "%ld\t%s\n", simpledu_block(file_size, arg.block_size), new_path);
+                            simpledu_log_ENTRY(simpledu_block(file_size, arg.block_size), new_path);
                             if(write(STDOUT_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
                         }
                     } break;
@@ -222,6 +224,7 @@ int simpledu_print(const char *path, off_t size, off_t more_size, simpledu_args_
     if (arg.max_depth >= 0) {
         char buf[BUFFER_SIZE];
         sprintf(buf, "%ld\t%s\n", simpledu_block(total_size, arg.block_size), path);
+        simpledu_log_ENTRY(simpledu_block(total_size, arg.block_size), path);
         if(write(STDOUT_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
     }
     if(arg.pipe_filedes != -1){
