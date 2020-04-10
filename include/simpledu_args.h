@@ -63,6 +63,8 @@ typedef struct {
     int pipe_filedes;
 
     micro_t start_time;
+
+    pid_t children_process_group;
     /**
      * @brief Size of files array.
      */

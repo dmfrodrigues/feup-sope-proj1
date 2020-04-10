@@ -20,6 +20,10 @@ void test_simpledu_args_ctor1(void) {
     TEST_CHECK(args.dereference == false);
     TEST_CHECK(args.separate_dirs == false);
     TEST_CHECK(args.max_depth >= PATH_MAX / 2);
+
+
+
+    TEST_CHECK(args.children_process_group == 0);
     TEST_CHECK(args.filesc == 1);
     TEST_CHECK(strcmp(args.files[0], ".") == 0);
     TEST_CHECK(simpledu_args_dtor(&args) == EXIT_SUCCESS);
@@ -27,10 +31,10 @@ void test_simpledu_args_ctor1(void) {
 }
 
 void test_simpledu_args_ctor2(void){
-    int argc = 7;
-    const char *argv_const[8] = {"prog", "-a",  "-l", "-S", "--block-size=1",
+    int argc = 8;
+    const char *argv_const[9] = {"prog", "-a",  "-l", "-S", "--block-size=1", "--children-process-group=123",
                                  "./a",  "./b", NULL};
-    char *argv[8];
+    char *argv[9];
     argv[argc] = NULL;
     for (int i = 0; i < argc; ++i) {
         argv[i] = malloc((strlen(argv_const[i]) + 1)*sizeof(char));
@@ -44,6 +48,10 @@ void test_simpledu_args_ctor2(void){
     TEST_CHECK(args.dereference == false);
     TEST_CHECK(args.separate_dirs == true);
     TEST_CHECK(args.max_depth >= PATH_MAX / 2);
+
+
+
+    TEST_CHECK(args.children_process_group == 123);
     TEST_CHECK(args.filesc == 2);
     TEST_CHECK(strcmp(args.files[0], "./a") == 0);
     TEST_CHECK(strcmp(args.files[1], "./b") == 0);

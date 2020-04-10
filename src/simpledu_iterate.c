@@ -9,6 +9,8 @@
 #include <stdlib.h>
 
 #include "simpledu_stat.h"
+#include "simpledu_args.h"
+#include "simpledu_signals.h"
 
 #define BUFFER_SIZE 1024+PATH_MAX
 
@@ -29,6 +31,8 @@ int simpledu_get_program_path(char *path, size_t n) {
 
 
 int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_t arg, char *envp[]) {
+    //sleep(1);
+
     int ret = EXIT_SUCCESS;
 
     char buf[BUFFER_SIZE];
@@ -113,11 +117,25 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                 }
                 switch (new_mode) {
                     case simpledu_mode_dir: {
-                        int pid = fork();
+                        pid_t pid = fork();
 
                         if (pid > 0) {  // parent
-
+                            if(arg.children_process_group == 0){ 
+                                //Setting the arg for first parent
+                                arg.children_process_group = pid;
+                                initialize_data(arg.children_process_group);
+                            }
                         } else if (pid == 0) {  // child
+                            if(arg.children_process_group == 0){
+                                //Setting the arg and pgid for first child
+                                arg.children_process_group = getpid();
+                                setpgid(0, getpid());
+                            }
+                            else {
+                                //Setting the pgid for all other children (arg will be inherited)
+                                //Only for remainding children of first process
+                                setpgid(0, arg.children_process_group);
+                            }
                             --arg.max_depth;
                             close(filedes[0]);
                             arg.pipe_filedes = filedes[1];

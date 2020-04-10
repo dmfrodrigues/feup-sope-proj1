@@ -18,12 +18,14 @@ static const simpledu_args_t simpledu_args_default =
 .log_filedes = -1, 
 .pipe_filedes = -1,
 .start_time = -1,
+.children_process_group = 0,
 .filesc = 0, 
 .files = NULL
 };
 
 static const char optstring[] = "abLlSB:d:f:p:s:";
 static int apparent_size = false;
+static int children_process_group = false;
 static const struct option longopts[] = {
     {"all"          , 0, NULL, 'a'},
     {"bytes"        , 0, NULL, 'b'},
@@ -36,6 +38,7 @@ static const struct option longopts[] = {
     {"log-filedes"  , 1, NULL, 'f'},
     {"pipe-filedes" , 1, NULL, 'p'},
     {"start-time"   , 1, NULL, 's'},
+    {"children-process-group", 1, &children_process_group, 1},
     {0,0,0,0}
 };
 
@@ -68,6 +71,8 @@ int simpledu_args_ctor(simpledu_args_t *p, int argc, char *argv[]){
                 if(apparent_size){
                     p->apparent_size = true;
                     apparent_size = false;
+                } else if(children_process_group){
+                    if(sscanf(optarg, "%d" , &p->children_process_group) != 1) return EXIT_FAILURE;
                 }
                 break;
             case '?':
@@ -142,6 +147,7 @@ bool simpledu_args_equal(const simpledu_args_t *p1, const simpledu_args_t *p2){
         p1->log_filedes     == p2->log_filedes      && 
         p1->pipe_filedes    == p2->pipe_filedes     && 
         p1->start_time      == p2->start_time       && 
+        p1->children_process_group == p2->children_process_group && 
         p1->filesc          == p2->filesc
     )) return false;
     for(size_t i = 0; i < p1->filesc; ++i){
@@ -161,6 +167,7 @@ int simpledu_args_copy(simpledu_args_t *p1, const simpledu_args_t *p2){
     p1->log_filedes     = p2->log_filedes;
     p1->pipe_filedes    = p2->pipe_filedes;
     p1->start_time      = p2->start_time;
+    p1->children_process_group = p2->children_process_group;
     p1->filesc          = p2->filesc;
     p1->files = malloc(p1->filesc*sizeof(char*));
     for(size_t i = 0; i < p1->filesc; ++i){
@@ -211,6 +218,7 @@ int simpledu_args_toargv(const simpledu_args_t *p, char ***pargv){
     { sprintf(buf, "--log-filedes=%d" , p->log_filedes ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //log_filedes
     { sprintf(buf, "--pipe-filedes=%d", p->pipe_filedes); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //pipe_filedes
     { sprintf(buf, "--start-time=%lld", p->start_time  ); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //pipe_filedes
+    { sprintf(buf, "--children-process-group=%d", p->children_process_group); strcpy(argv[i++] = malloc((strlen(buf)+1)*sizeof(char)), buf); } //pipe_filedes
     
     for(size_t j = 0; j < p->filesc; ++i, ++j){
         argv[i] = malloc((strlen(p->files[j])+1)*sizeof(char));

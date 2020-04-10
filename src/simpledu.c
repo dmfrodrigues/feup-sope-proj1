@@ -9,10 +9,12 @@
 #include "simpledu_time.h"
 #include "simpledu_log.h"
 #include "simpledu_iterate.h"
+#include "simpledu_signals.h"
+
+#include "arg.h"
 
 #define FILEDES_INVALID -1
 
-simpledu_args_t arg;
 simpledu_envp_t env;
 
 int simpledu_init(int argc, char *argv[], char *envp[]){
@@ -20,7 +22,6 @@ int simpledu_init(int argc, char *argv[], char *envp[]){
     if(simpledu_args_ctor(&arg, argc, argv) ||
        simpledu_envp_ctor(&env, envp)) return EXIT_FAILURE;
 
-    //
     return EXIT_SUCCESS;
 }
 
@@ -30,9 +31,11 @@ void simpledu_clean(void){
 }
 
 int main(int argc, char *argv[], char *envp[]){
-
     if(simpledu_init(argc, argv, envp)) simpledu_exit(EXIT_FAILURE);
     if(atexit(simpledu_clean)) simpledu_exit(EXIT_FAILURE);
+
+    initialize_data(arg.children_process_group);
+    if (simpledu_handler()) return EXIT_FAILURE;
 
     //Time
     if(arg.start_time == -1){
@@ -84,6 +87,6 @@ int main(int argc, char *argv[], char *envp[]){
     if(arg.pipe_filedes != -1){
         close(arg.pipe_filedes);
     }
-
+    //printf("\t%d/%d\n", getpid(), getpgrp());
     simpledu_exit(ret);
 }

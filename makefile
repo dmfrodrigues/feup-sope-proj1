@@ -27,7 +27,7 @@ clean:
 test: all
 	@echo Current directory: $(PWD)
 	$(CC) $(CFLAGS) -c -I./acutest/include $(TDIR)/tests.c -o $(ODIR)/tests.o
-	$(CC) $(ODIR)/tests.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_envp.o $(ODIR)/simpledu_stat.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o $(ODIR)/simpledu_iterate.o -o $(ODIR)/$(TEXE)
+	$(CC) $(ODIR)/tests.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_envp.o $(ODIR)/simpledu_stat.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o $(ODIR)/simpledu_iterate.o $(ODIR)/simpledu_signals.o -o $(ODIR)/$(TEXE)
 	$(ODIR)/$(TEXE)
 	chmod u+x $(TDIR)/*.sh
 	$(TDIR)/test_compare_du.sh
@@ -39,8 +39,8 @@ makefolders:
 	mkdir -p $(ODIR)
 	mkdir -p $(TDIR)
 
-$(PROG):  $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_envp.o $(ODIR)/simpledu_stat.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o $(ODIR)/simpledu_iterate.o
-	$(CC) $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_envp.o $(ODIR)/simpledu_stat.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o $(ODIR)/simpledu_iterate.o -o simpledu
+$(PROG):  $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_envp.o $(ODIR)/simpledu_stat.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o $(ODIR)/simpledu_iterate.o $(ODIR)/simpledu_signals.o
+	$(CC) $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_envp.o $(ODIR)/simpledu_stat.o $(ODIR)/simpledu_log.o $(ODIR)/simpledu_time.o $(ODIR)/simpledu_iterate.o $(ODIR)/simpledu_signals.o -o simpledu
 
 $(ODIR)/%.o:          $(SDIR)/%.c
 	$(CC) $(CFLAGS) -c $^ -o $@
