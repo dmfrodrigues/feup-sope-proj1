@@ -64,12 +64,12 @@ void simpledu_exit(int status);
 /**
  * @brief Send signal to process.
  * 
- * Must be used instead of kill(2) to allow logging.
+ * Must be used instead of killpg(2) to allow logging.
  * 
- * @param pid   Process ID to send the signal to
+ * @param pid   Process group ID to send the signal to
  * @param sig   Signal to send
  * @return int  EXIT_SUCCESS if successful, otherwise EXIT_FAILURE and errno is set
  */
-int simpledu_kill(pid_t pid, int sig);
+int simpledu_killpg(pid_t pid, int sig);
 
 #endif //SIMPLEDU_LOG_H_INCLUDED

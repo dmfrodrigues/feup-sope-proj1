@@ -8,6 +8,7 @@
 
 #include "arg.h"
 #include "simpledu_args.h"
+#include "simpledu_log.h"
 
 static pid_t children_group;
 void initialize_data(pid_t p) { children_group = p; }
@@ -48,16 +49,16 @@ void sigint_handler(int signo) {
     }
 
     if (signo == SIGINT) {
-        killpg(pgid, SIGSTOP);
+        if (simpledu_killpg(pgid, SIGSTOP)) return;
         sprintf(output, "Are you sure you want to terminate the program? (y/n)\n");
         write(STDERR_FILENO, output, strlen(output));
 
         read(STDIN_FILENO, input, 1);
         if (*input == 'n' || *input == 'N') {
-            killpg(pgid, SIGCONT);
+            if (simpledu_killpg(pgid, SIGCONT)) return;
         } else /*if (*input == 'y' || *input == 'Y')*/ {
-            killpg(pgid, SIGTERM);
-            killpg(0, SIGTERM);
+            if (simpledu_killpg(pgid, SIGTERM)) return;
+            if (simpledu_killpg(0, SIGTERM)) return;
         }
     }
 }
