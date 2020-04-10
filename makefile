@@ -45,7 +45,7 @@ $(PROG):  $(ODIR)/simpledu.o $(ODIR)/simpledu_args.o $(ODIR)/simpledu_envp.o $(O
 $(ODIR)/%.o:          $(SDIR)/%.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
-GROUP=T5G06
+GROUP=T6G05
 
 zip: clean
 	rm -rf $(GROUP)
