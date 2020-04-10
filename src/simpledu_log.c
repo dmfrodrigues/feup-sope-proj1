@@ -91,6 +91,22 @@ int simpledu_log_ENTRY(long long unsigned size, const char *path){
     return EXIT_SUCCESS;
 }
 
+int simpledu_log_RECV_PIPE(const char *s){
+    if(filedes == -1) return EXIT_SUCCESS;
+    double t; if(simpledu_gettime(&t)) return EXIT_FAILURE; 
+    char buff[MAXN]; if(sprintf(buff, "%.2f %08d RECV_PIPE %s\n", t, getpid(), s) < 0) return EXIT_FAILURE;
+    if(simpledu_log_write(buff, strlen(buff)) == -1) return EXIT_FAILURE;
+    return EXIT_SUCCESS;
+}
+
+int simpledu_log_SEND_PIPE(const char *s){
+    if(filedes == -1) return EXIT_SUCCESS;
+    double t; if(simpledu_gettime(&t)) return EXIT_FAILURE; 
+    char buff[MAXN]; if(sprintf(buff, "%.2f %08d SEND_PIPE %s", t, getpid(), s) < 0) return EXIT_FAILURE;
+    if(simpledu_log_write(buff, strlen(buff)) == -1) return EXIT_FAILURE;
+    return EXIT_SUCCESS;
+}
+
 void simpledu_exit(int status){
     int res = simpledu_log_EXIT(status);
     if(res) exit(res);

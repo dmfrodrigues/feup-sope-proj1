@@ -208,6 +208,7 @@ int simpledu_retrieve(int pipe_filedes, off_t *size) {
         if(r > 0){
             if(status) ret = EXIT_FAILURE;
             if(readline(pipe_filedes, line)) return 2;
+            simpledu_log_RECV_PIPE(line);
             off_t more_size;
             if(sscanf(line, "%ld", &more_size)!=1) return 2;
             *size += more_size;
@@ -230,6 +231,7 @@ int simpledu_print(const char *path, off_t size, off_t more_size, simpledu_args_
     if(arg.pipe_filedes != -1){
         char buf[PIPE_BUF];
         sprintf(buf, "%ld\n", size+more_size);
+        simpledu_log_SEND_PIPE(buf);
         if(write(arg.pipe_filedes, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

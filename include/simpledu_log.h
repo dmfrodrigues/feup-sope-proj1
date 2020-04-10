@@ -52,6 +52,10 @@ int simpledu_log_RECV_SIGNAL(int sig);
  */
 int simpledu_log_ENTRY(long long unsigned size, const char *path);
 
+int simpledu_log_RECV_PIPE(const char *s);
+
+int simpledu_log_SEND_PIPE(const char *s);
+
 /**
  * @brief Cause normal process termination.
  * 
