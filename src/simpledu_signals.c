@@ -1,7 +1,6 @@
 #define _XOPEN_SOURCE 700
 #include "simpledu_signals.h"
 
-
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
