@@ -4,5 +4,6 @@ test/test
 .vscode/*
 !.vscode/launch.json
 *.log
-T5G06.zip
+*.zip
+T6G05/
 T5G06/
