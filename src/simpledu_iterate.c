@@ -32,7 +32,7 @@ int simpledu_get_program_path(char *path, size_t n) {
 
 
 int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_t arg, char *envp[]) {
-    //sleep(1);
+    sleep(1);
 
     int ret = EXIT_SUCCESS;
 

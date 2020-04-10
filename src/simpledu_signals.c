@@ -40,6 +40,8 @@ int simpledu_handler() {
 }
 
 void sigint_handler(int signo) {
+    simpledu_log_RECV_SIGNAL(signo);
+
     pid_t pgid = children_group;
 
     char input[PATH_MAX] = {0};
