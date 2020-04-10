@@ -50,7 +50,7 @@ void sigint_handler(int signo) {
     if (signo == SIGINT) {
         killpg(pgid, SIGSTOP);
         sprintf(output, "Are you sure you want to terminate the program? (y/n)\n");
-        write(STDOUT_FILENO, output, strlen(output));
+        write(STDERR_FILENO, output, strlen(output));
 
         read(STDIN_FILENO, input, 1);
         if (*input == 'n' || *input == 'N') {
