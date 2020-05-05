@@ -5,13 +5,14 @@
 </p>
 
 - **Project name:** simpledu
-- **Short description:** Clone of Unix command `du` (estimate file space usage), supporting most relevant options
-- **Institution:** FEUP
-- **Course:** SOPE (Operating Systems)
+- **Short description:** Clone of Unix command `du` ([estimate file space usage](https://linux.die.net/man/1/du)), supporting most relevant options
+- **Institution:** [FEUP](https://sigarra.up.pt/feup/en/web_page.Inicial)
+- **Course:** [SOPE](https://sigarra.up.pt/feup/en/UCURR_GERAL.FICHA_UC_VIEW?pv_ocorrencia_id=436440) (Operating Systems)
+- **Project grade:** 100%
 - **Group members:**
-    - Diogo Miguel Ferreira Rodrigues (diogo.rodrigues@fe.up.pt / up201806429@fe.up.pt)
-    - João António Cardoso Vieira e Basto de Sousa (up201806613@fe.up.pt)
-    - Rafael Soares Ribeiro (up201806330@fe.up.pt)
+    - [Diogo Miguel Ferreira Rodrigues](https://github.com/dmfrodrigues) ([diogo.rodrigues@fe.up.pt](mailto:diogo.rodrigues@fe.up.pt)/[up201806429@fe.up.pt](mailto:up201806429@fe.up.pt))
+    - [João António Cardoso Vieira e Basto de Sousa](https://github.com/JoaoASousa) ([up201806613@fe.up.pt](up201806613@fe.up.pt))
+    - [Rafael Soares Ribeiro](https://github.com/up201806330) ([up201806330@fe.up.pt](mailto:up201806330@fe.up.pt))
 
 Estimates file space usage.
 
