@@ -13,7 +13,8 @@
  * @param envp      Environment variables
  * @return int      EXIT_SUCCESS if successful, EXIT_FAILURE otherwise
  */
-int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_t arg, char *envp[]);
+int simpledu_iterate(const char *path, int *pipe_id, off_t *size,
+                     simpledu_args_t arg, char *envp[]);
 
 /**
  * @brief Retrieve data from pipe.

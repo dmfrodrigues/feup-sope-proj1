@@ -31,7 +31,8 @@ int simpledu_get_program_path(char *path, size_t n) {
 }
 
 
-int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_t arg, char *envp[]) {
+int simpledu_iterate(const char *path, int *pipe_id, off_t *size,
+                     simpledu_args_t arg, char *envp[]) {
     //sleep(1);
 
     int ret = EXIT_SUCCESS;
@@ -76,8 +77,10 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
         case simpledu_mode_dir:{
             DIR *dir_to_iter = opendir(path);
             if (dir_to_iter == NULL) {
-                sprintf(buf, "du: cannot read directory '%s': %s\n", path, strerror(errno));
-                if(write(STDERR_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
+                sprintf(buf, "du: cannot read directory '%s': %s\n",
+                    path, strerror(errno));
+                if(write(STDERR_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf))
+                    return EXIT_FAILURE;
                 close(filedes[0]);
                 close(filedes[1]);
                 return EXIT_FAILURE;
@@ -99,7 +102,8 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                     if (arg.dereference) {
                         if (realpath(new_path, new_path_actual) == NULL) {
                             sprintf(buf, "du: cannot access '%s'\n", new_path);
-                            if(write(STDERR_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
+                            if(write(STDERR_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf))
+                                return EXIT_FAILURE;
                             ret = EXIT_FAILURE;
                             continue;
                         }
@@ -111,7 +115,8 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                 simpledu_mode_t new_mode;{
                     if(simpledu_mode(new_path_actual, &new_mode)){
                         sprintf(buf, "du: cannot access '%s'\n", new_path);
-                        if(write(STDERR_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
+                        if(write(STDERR_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf))
+                            return EXIT_FAILURE;
                         ret = EXIT_FAILURE;
                         continue;
                     }
@@ -133,7 +138,8 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                                 setpgid(0, getpid());
                             }
                             else {
-                                //Setting the pgid for all other children (arg will be inherited)
+                                //Setting the pgid for all other children
+                                //(arg will be inherited)
                                 //Only for remainding children of first process
                                 setpgid(0, arg.children_process_group);
                             }
@@ -157,9 +163,12 @@ int simpledu_iterate(const char *path, int *pipe_id, off_t *size, simpledu_args_
                         if (file_size == -1) return EXIT_FAILURE;
                         *size += file_size;
                         if (arg.max_depth > 0 && arg.all) {
-                            sprintf(buf, "%ld\t%s\n", simpledu_block(file_size, arg.block_size), new_path);
-                            simpledu_log_ENTRY(simpledu_block(file_size, arg.block_size), new_path);
-                            if(write(STDOUT_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
+                            sprintf(buf, "%ld\t%s\n",
+                                simpledu_block(file_size, arg.block_size), new_path);
+                            simpledu_log_ENTRY(simpledu_block(file_size, arg.block_size),
+                                new_path);
+                            if(write(STDOUT_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf))
+                                return EXIT_FAILURE;
                         }
                     } break;
                     default: break;
@@ -226,13 +235,15 @@ int simpledu_print(const char *path, off_t size, off_t more_size, simpledu_args_
         char buf[BUFFER_SIZE];
         sprintf(buf, "%ld\t%s\n", simpledu_block(total_size, arg.block_size), path);
         simpledu_log_ENTRY(simpledu_block(total_size, arg.block_size), path);
-        if(write(STDOUT_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
+        if(write(STDOUT_FILENO, buf, strlen(buf)) != (ssize_t)strlen(buf))
+            return EXIT_FAILURE;
     }
     if(arg.pipe_filedes != -1){
         char buf[PIPE_BUF];
         sprintf(buf, "%ld\n", size+more_size);
         simpledu_log_SEND_PIPE(buf);
-        if(write(arg.pipe_filedes, buf, strlen(buf)) != (ssize_t)strlen(buf)) return EXIT_FAILURE;
+        if(write(arg.pipe_filedes, buf, strlen(buf)) != (ssize_t)strlen(buf))
+            return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
