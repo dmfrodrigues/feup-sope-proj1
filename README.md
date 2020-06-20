@@ -1,8 +1,8 @@
 # simpledu
 
-<p align="left">
-  <img src="https://github.com/dmfrodrigues/feup-sope-proj1/workflows/test/badge.svg">
-</p>
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+![test](https://github.com/dmfrodrigues/feup-sope-proj1/workflows/test/badge.svg)
 
 - **Project name:** simpledu
 - **Short description:** Clone of Unix command `du` ([estimate file space usage](https://linux.die.net/man/1/du)), supporting most relevant options
