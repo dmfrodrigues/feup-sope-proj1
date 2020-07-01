@@ -74,4 +74,4 @@ All files are licensed under [GNU General Public License v3](LICENSE), to the ex
 - `.pdf` file, which were authored by the lecturers
 - submodules, which are subject to specific licenses
 
-The files not authored by us are presented as a fundamental complement to the presented solutions, and are made available under *fair use for education*.
+The files not authored by us are presented as a fundamental complement to this project, and are made available under *fair use for education*.
