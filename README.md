@@ -6,6 +6,8 @@
 
 - **Project name:** simpledu
 - **Short description:** Clone of Unix command `du` ([estimate file space usage](https://linux.die.net/man/1/du)), supporting most relevant options
+- **Environment:** Linux
+- **Tools:** C, Linux API
 - **Institution:** [FEUP](https://sigarra.up.pt/feup/en/web_page.Inicial)
 - **Course:** [SOPE](https://sigarra.up.pt/feup/en/UCURR_GERAL.FICHA_UC_VIEW?pv_ocorrencia_id=436440) (Operating Systems)
 - **Project grade:** 100%
@@ -18,50 +20,58 @@ Estimates file space usage.
 
 For each subdirectory, creates a new process and communicates via pipes.
 
-## Make commands
-### Compile
+## Install
+
+To compile the program, run `make`.
+
+### Make commands
 
 ```sh
-make
+make          # Compile program
+make test     # Run unit tests and functionality tests
+make clean    # Cleanup files
+make zip      # Create zip file to be submitted
+make testzip  # Run tests for zip file to be submitted
 ```
 
-### Test
+## Usage
 
-```sh
-make test
 ```
-
-### Cleanup
-
-```sh
-make clean
-```
-
-### Create ZIP file
-
-```sh
-make zip
-```
-
-### Test ZIP file contents
-
-```sh
-make testzip
-```
-
-## User Commands
-
-```sh
 ./simpledu [OPTION]... [FILE]...
+
+Summarizes file space usage for FILE
 ```
 
-Supports the following options, with behaviour similar to `du`:
-- `-a, --all`
-- `--apparent-size`
-- `-B, --block-size=SIZE`
-- `-l, --count-links` (activated by default, cannot be deactivated)
-- `-L, --dereference`
-- `-S, --separate-dirs`
-- `-d, --max-depth=N`
+### Options
 
-May receive as many files as wanted in `[FILE]...`.
+```
+Supports the following options, with behaviour similar to du(1):
+
+-a, --all               write counts of all files, not just directories
+--apparent-size         print apparent sizes rather than disk usage
+-B, --block-size=SIZE   scale sizes by SIZE before printing
+-l, --count-links       count izes many times if hard linked (activated by default, cannot be deactivated)
+-L, --dereference       dereference all symbolic links
+-S, --separate-dirs     for directories do not include size of subdirectories
+-d, --max-depth=N       print the total for a directory only if it is in N or fewer levels below the command line argument
+```
+
+### Examples
+
+- `./simpledu -l test/test-folder`
+- `./simpledu -l test/test-folder -b`
+- `./simpledu -l test/test-folder -b -S`
+- `./simpledu -l test/test-folder -b -S --max-depth=2`
+- `./simpledu -l test/test-folder -B 1`
+- `./simpledu -l test/test-folder -a`
+- `./simpledu -l test/test-folder -a -L`
+
+## License
+
+© 2020 Diogo Rodrigues, João António Sousa, Rafael Ribeiro
+
+All files are licensed under [GNU General Public License v3](LICENSE), to the exception of:
+- `.pdf` file, which were authored by the lecturers
+- submodules, which are subject to specific licenses
+
+The files not authored by us are presented as a fundamental complement to the presented solutions, and are made available under *fair use for education*.
