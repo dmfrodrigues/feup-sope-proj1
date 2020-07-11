@@ -352,6 +352,6 @@ test/compare_simpledu_du.sh "./simpledu" "-l test/test-folder/D1/Db/Dx/F3bin -a 
 # Testes grandes
 test/compare_simpledu_du.sh "./simpledu" "-l .."
 test/compare_simpledu_du.sh "./simpledu" "-l ../../.docker"
-test/compare_simpledu_du.sh "./simpledu" "-l ../.."
-test/compare_simpledu_du.sh "./simpledu" "-l ../../.."
+# test/compare_simpledu_du.sh "./simpledu" "-l ../.."
+# test/compare_simpledu_du.sh "./simpledu" "-l ../../.."
 test/compare_simpledu_du.sh "./simpledu" "-l /home"
