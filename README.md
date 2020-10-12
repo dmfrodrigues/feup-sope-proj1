@@ -3,6 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ![test](https://github.com/dmfrodrigues/feup-sope-proj1/workflows/test/badge.svg)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/c5e457edb77d4b4081daa29e643ac842)](https://www.codacy.com/gh/dmfrodrigues/feup-sope-proj1/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dmfrodrigues/feup-sope-proj1&amp;utm_campaign=Badge_Grade)
 
 - **Project name:** simpledu
 - **Short description:** Clone of Unix command `du` ([estimate file space usage](https://linux.die.net/man/1/du)), supporting most relevant options
